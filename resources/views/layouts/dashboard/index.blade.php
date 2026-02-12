@@ -22,7 +22,6 @@
 
     <link href="dashboards/vendors/select2-bootstrap-theme/select2.bootstrap.min.css" rel="stylesheet" />
     <link href="dashboards/vendors/select2/select2.min.css" rel="stylesheet" />
-    <script src="dashboards/vendors/select2/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- End plugin css for this page -->
@@ -75,6 +74,7 @@
     <!-- End custom js for this page-->
 
     <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="dashboards/vendors/select2/select2.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 
     @stack('dashboard.script')

@@ -41,9 +41,11 @@
                                                                         style="color:red">*</span></label>
                                                                 <select id="customer_id" class="form-select"
                                                                     name="customer_id">
-                                                                    <option selected hidden>=== Pilih Customer === </option>
+                                                                    <option></option>
                                                                     @foreach ($customers as $customer)
-                                                                        <option value="{{ $customer->customer_id }}">
+                                                                        <option value="{{ $customer->customer_id }}"
+                                                                            data-phone="{{ $customer->customer_phone }}"
+                                                                            data-address="{{ $customer->customer_address }}">
                                                                             {{ $customer->customer_name }} -
                                                                             {{ $customer->customer_owner }}</option>
                                                                     @endforeach
@@ -593,6 +595,53 @@
     <script>
         $(document).ready(function() {
             $('#table-sales').DataTable();
+
+            $('#addModal #customer_id').select2({
+                dropdownParent: $('#addModal'),
+                placeholder: '=== Pilih Customer ===',
+                width: '100%',
+                templateResult: function(data) {
+                    if (!data.id) {
+                        return data.text;
+                    }
+                    var phone = $(data.element).data('phone');
+                    var address = $(data.element).data('address');
+
+                    var $result = $(
+                        '<div style="padding: 4px;">' +
+                        '<div style="font-weight: bold; font-size: 1.1em;">' + data.text + '</div>' +
+                        '<div style="font-size: 0.9em; color: #555; margin-top: 4px;">' +
+                        '<i class="mdi mdi-phone" style="margin-right: 5px;"></i>' + (phone ? phone : '-') +
+                        '</div>' +
+                        '<div style="font-size: 0.9em; color: #555;">' +
+                        '<i class="mdi mdi-map-marker" style="margin-right: 5px;"></i>' + (address ? address :
+                            '-') +
+                        '</div>' +
+                        '</div>'
+                    );
+                    return $result;
+                },
+                matcher: function(params, data) {
+                    if ($.trim(params.term) === '') {
+                        return data;
+                    }
+
+                    if (typeof data.text === 'undefined') {
+                        return null;
+                    }
+
+                    var term = params.term.toLowerCase();
+                    var text = data.text.toLowerCase();
+                    var phone = $(data.element).data('phone') ? String($(data.element).data('phone')).toLowerCase() : '';
+                    var address = $(data.element).data('address') ? String($(data.element).data('address')).toLowerCase() : '';
+
+                    if (text.indexOf(term) > -1 || phone.indexOf(term) > -1 || address.indexOf(term) > -1) {
+                        return data;
+                    }
+
+                    return null;
+                }
+            });
         });
 
         $(document).ready(function() {
