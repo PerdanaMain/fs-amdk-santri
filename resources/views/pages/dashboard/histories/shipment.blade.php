@@ -1,7 +1,7 @@
 @extends('layouts.dashboard.index')
 
 @section('title')
-    Shipments
+    Riwayat Pengiriman
 @endsection
 
 @section('content.dashboard')
@@ -10,11 +10,11 @@
             <div class="col-lg-12 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
-                        <h4 class="card-title">Data Pengiriman Barang</h4>
+                        <h4 class="card-title">Riwayat Pengiriman Barang</h4>
                         <div class="d-block my-4">
                             @if (in_array(session()->get('user')->role_id, [1, 2, 4, 5, 6]))
                                 <button type="button" class="btn btn-success me-2 mb-3" data-bs-toggle="modal"
-                                    data-bs-target="#exportModal">Export Pengiriman</button>
+                                    data-bs-target="#exportModal">Export Riwayat</button>
                             @endif
                         </div>
                         <div class="table-responsive">
@@ -40,13 +40,7 @@
                                                 </a>
                                             </td>
                                             <td>
-                                                @if ($ship->shipment_status == 'PENDING')
-                                                    <label class="badge badge-warning">Pending</label>
-                                                @elseif ($ship->shipment_status == 'DELIVERY')
-                                                    <label class="badge badge-info">DELIVERY</label>
-                                                @elseif ($ship->shipment_status == 'DONE')
-                                                    <label class="badge badge-success">DONE</label>
-                                                @endif
+                                                <label class="badge badge-success">{{ $ship->shipment_status }}</label>
                                             </td>
                                             <td>
                                                 <a class="nav-link" id="StockDropdown" href="#"
@@ -59,22 +53,6 @@
                                                         data-bs-target="#infoModal-{{ $ship->shipment_id }}"><i
                                                             class="dropdown-item-icon mdi mdi-information-outline me-2"></i>
                                                         Info </button>
-                                                    @if ($ship->shipment_status == 'PENDING')
-                                                        @if (in_array(auth()->user()->role_id, [1]))
-                                                            <button class="dropdown-item" data-id="{{ $ship->shipment_id }}"
-                                                                id="pending-button"><i
-                                                                    class="dropdown-item-icon mdi mdi-car me-2"></i>
-                                                                Delivery Now </button>
-                                                        @endif
-                                                    @elseif ($ship->shipment_status == 'DELIVERY')
-                                                        @if (in_array(auth()->user()->role_id, [4]))
-                                                            <button class="dropdown-item" data-id="{{ $ship->shipment_id }}"
-                                                                id="delivery-button"><i
-                                                                    class="dropdown-item-icon mdi mdi-information-outline me-2"></i>
-                                                                Done </button>
-                                                        @endif
-                                                    @endif
-
                                                 </div>
                                             </td>
                                         </tr>
@@ -93,14 +71,14 @@
                                                         <div class="row">
                                                             <div class="col-md-6">
                                                                 <p>Nama Customer
-                                                                    : {{ $ship->customer_name }}</p>
+                                                                    : {{ $ship->sale->customer->customer_name }}</p>
                                                                 </p>
                                                                 <p>Nama Barang
                                                                     : {{ $ship->sale->stock->stock_name }}</p>
                                                                 </p>
                                                                 <p>Jumlah
                                                                     :
-                                                                    {{ $ship->sale->sale_quatity . ' ' . $ship->sale->stock->stock_satuan }}
+                                                                    {{ $ship->sale->sale_quantity . ' ' . $ship->sale->stock->stock_satuan }}
                                                                 </p>
                                                                 </p>
                                                             </div>
@@ -137,14 +115,14 @@
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="exportModalLabel">Export Pengiriman</h5>
+                                        <h5 class="modal-title" id="exportModalLabel">Export Riwayat Pengiriman</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                             aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
                                         <div class="row">
                                             <form class="forms-sample" method="POST"
-                                                action="{{ route('delivery.export') }}">
+                                                action="{{ route('deliveryHistory.export') }}">
                                                 @csrf
                                                 <div class="row">
                                                     <div class="col-md-6 col-sm-12" id="tenggat-awal">
@@ -200,100 +178,6 @@
     <script>
         $(document).ready(function() {
             $('#table-shipment').DataTable();
-        });
-
-        $(document).on("click", "#pending-button", function() {
-            let shipment_id = $(this).data('id');
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You want to delivery this shipment now?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Delivery Now'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '/delivery/shipping/' + shipment_id,
-                        type: 'PUT',
-                        data: {
-                            _token: $("input[name=_token]").val()
-                        },
-                        success: function(response) {
-                            if (response.status == true) {
-                                Swal.fire(
-                                    'Success!',
-                                    response.message,
-                                    'success'
-                                ).then((result) => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire(
-                                    'Error!',
-                                    response.message,
-                                    'error'
-                                );
-                            }
-                        },
-                        error: function(xhr) {
-                            Swal.fire(
-                                'Error!',
-                                xhr.responseJSON.message,
-                                'error'
-                            );
-                        }
-                    });
-                }
-            });
-        });
-
-        $(document).on("click", "#delivery-button", function() {
-            let shipment_id = $(this).data('id');
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You want to mark this shipment as done?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Done'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '/delivery/done/' + shipment_id,
-                        type: 'PUT',
-                        data: {
-                            _token: $("input[name=_token]").val()
-                        },
-                        success: function(response) {
-                            if (response.status == true) {
-                                Swal.fire(
-                                    'Success!',
-                                    response.message,
-                                    'success'
-                                ).then((result) => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire(
-                                    'Error!',
-                                    response.message,
-                                    'error'
-                                );
-                            }
-                        },
-                        error: function(xhr) {
-                            Swal.fire(
-                                'Error!',
-                                xhr.responseJSON.message,
-                                'error'
-                            );
-                        }
-                    });
-                }
-            });
         });
     </script>
 

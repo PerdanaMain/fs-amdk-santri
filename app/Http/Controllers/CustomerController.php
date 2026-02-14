@@ -243,4 +243,20 @@ class CustomerController extends Controller
         $template = Storage::disk('public')->path('template/Customer-Template.xlsx');
         return response()->download($template);
     }
+
+    public function show($id)
+    {
+        $customer = Customer::with([
+            'sales' => function ($query) {
+                $query->orderBy('created_at', 'desc');
+            },
+            'sales.stock',
+            'sales.payment',
+            'sales.status',
+            'sales.user',
+            'user'
+        ])->findOrFail($id);
+
+        return view('pages.dashboard.customers.detail', compact('customer'));
+    }
 }

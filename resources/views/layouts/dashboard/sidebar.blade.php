@@ -101,6 +101,14 @@
                 </a>
             </li>
         @endif
+        @if (in_array(session()->get('user')->role_id, [1, 2, 5, 6]))
+            <li class="nav-item {{ Route::currentRouteName() == 'deliveryHistory' ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('deliveryHistory') }}">
+                    <i class="mdi mdi-history menu-icon"></i>
+                    <span class="menu-title">Riwayat Pengiriman</span>
+                </a>
+            </li>
+        @endif
 
 
         <li class="nav-item nav-category">Settings</li>

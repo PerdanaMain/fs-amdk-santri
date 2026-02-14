@@ -5,6 +5,18 @@
 @endsection
 
 @section('content.dashboard')
+    <style>
+        .select2-search--dropdown .select2-search__field {
+            background-color: #e9ecef !important;
+            color: #333 !important;
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected],
+        .select2-container--bootstrap .select2-results__option--highlighted[aria-selected] {
+            background-color: #f8f9fa !important;
+            color: #333 !important;
+        }
+    </style>
     <div class="content-wrapper">
         <div class="row">
             <div class="col-lg-12 grid-margin stretch-card">
@@ -181,6 +193,7 @@
                                         <th>Harga Satuan</th>
                                         <th>Total Harga</th>
                                         <th>Status</th>
+                                        <th>Status Pembayaran</th>
                                         <th>PIC</th>
                                         <th>Actions</th>
                                     </tr>
@@ -205,6 +218,12 @@
                                           ">
                                                     {{ $sale->status->status_description }}
                                                 </label></td>
+                                            <td>
+                                                <label
+                                                    class="badge {{ $sale->payment_status == 'Lunas' ? 'badge-success' : 'badge-danger' }}">
+                                                    {{ $sale->payment_status }}
+                                                </label>
+                                            </td>
                                             <td>{{ $sale->user->user_name }}</td>
 
                                             <td>
@@ -218,6 +237,12 @@
                                                         data-bs-target="#infoModal-{{ $sale->sale_id }}"><i
                                                             class="dropdown-item-icon mdi mdi-information-outline me-2"></i>
                                                         Info </button>
+                                                    @if ($sale->payment_status == 'Belum Lunas')
+                                                        <button class="dropdown-item" id="pay_sales"
+                                                            data-id="{{ $sale->sale_id }}"><i
+                                                                class="dropdown-item-icon mdi mdi-cash-multiple me-2"></i>
+                                                            Bayar</button>
+                                                    @endif
 
                                                     @if ($sale->status->status_id == 6)
                                                         <button class="dropdown-item" data-bs-toggle="modal"
@@ -871,6 +896,46 @@
                 text: msg,
                 icon: "warning"
             });
+        })
+
+        $(document).on("click", "#pay_sales", function() {
+            var sale_id = $(this).data('id');
+
+            Swal.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin mengubah status pembayaran menjadi Lunas?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Bayar!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/sales/pay/" + sale_id,
+                        type: 'PATCH',
+                        data: {
+                            _token: $("input[name=_token]").val()
+                        },
+                        success: function(response) {
+                            if (response.status == true) {
+                                Swal.fire(
+                                    'Berhasil!',
+                                    response.message,
+                                    'success'
+                                )
+                                location.reload();
+                            } else {
+                                Swal.fire(
+                                    'Gagal!',
+                                    response.message,
+                                    'error'
+                                )
+                            }
+                        }
+                    });
+                }
+            })
         })
     </script>
 

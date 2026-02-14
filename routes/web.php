@@ -76,6 +76,7 @@ Route::group(["prefix" => "/"], function () {
 
         Route::prefix("customers")->group(function () {
             Route::get("/", [CustomerController::class, "index"])->name('customer');
+            Route::get("/{id}", [CustomerController::class, "show"])->name('customer.show');
             Route::post("/", [CustomerController::class, "store"])->name('customer.store');
             Route::post("/import", [CustomerController::class, "import"])->name('customer.import');
             Route::post("/export", [CustomerController::class, "export"])->name('customer.export');
@@ -124,6 +125,7 @@ Route::group(["prefix" => "/"], function () {
             Route::put("/{id}", [SalesController::class, "update"])->name("sales.update");
             Route::delete("/{id}", [SalesController::class, "destroy"])->name("sales.destroy");
             Route::patch("/{id}", [SalesController::class, "submit"])->name("sales.submission");
+            Route::patch("/pay/{id}", [SalesController::class, "pay"])->name("sales.pay");
             Route::put("/approve/{id}", [SalesController::class, "approve"])->name("sales.approve");
             Route::put("/reject/{id}", [SalesController::class, "reject"])->name("sales.reject");
         });
@@ -142,6 +144,7 @@ Route::group(["prefix" => "/"], function () {
 
         Route::prefix("delivery")->group(function () {
             Route::get("/", [ShipmentController::class, "index"])->name("delivery");
+            Route::post("/export", [ShipmentController::class, "export"])->name("delivery.export");
             Route::put("/shipping/{id}", [ShipmentController::class, "delivery"])->name("delivery.shipping");
             Route::put("/done/{id}", [ShipmentController::class, "done"])->name("delivery.done");
         });
@@ -152,6 +155,11 @@ Route::group(["prefix" => "/"], function () {
             Route::post("/export", [VisitController::class, "export"])->name("visit.export");
             Route::put("/{id}", [VisitController::class, "update"])->name("visit.update");
             Route::delete("/{id}", [VisitController::class, "destroy"])->name("visit.destroy");
+        });
+
+        Route::prefix("history-delivery")->group(function () {
+            Route::get("/", [ShipmentController::class, "history"])->name("deliveryHistory");
+            Route::post("/export", [ShipmentController::class, "export"])->name("deliveryHistory.export");
         });
 
         Route::prefix('profile')->group(function () {

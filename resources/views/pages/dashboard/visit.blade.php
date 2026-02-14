@@ -5,6 +5,18 @@
 @endsection
 
 @section('content.dashboard')
+    <style>
+        .select2-search--dropdown .select2-search__field {
+            background-color: #e9ecef !important;
+            color: #333 !important;
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected],
+        .select2-container--bootstrap .select2-results__option--highlighted[aria-selected] {
+            background-color: #f8f9fa !important;
+            color: #333 !important;
+        }
+    </style>
     <div class="content-wrapper">
         <div class="row">
             <div class="col-lg-12 grid-margin stretch-card">

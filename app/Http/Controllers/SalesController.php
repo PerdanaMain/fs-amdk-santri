@@ -157,6 +157,9 @@ class SalesController extends Controller
             ]);
             $user = session()->get('user');
             $dateTime = date_format(date_create(request("sale_date")), "Y-m-d H:i:s");
+            
+            // Payment Logic: Cash (1) = Lunas, Others = Belum Lunas
+            $paymentStatus = ((int)request("payment_id") == 1) ? 'Lunas' : 'Belum Lunas';
 
             if (request()->hasFile('sale_invoice')) {
                 $file = request()->file('sale_invoice');
@@ -175,6 +178,7 @@ class SalesController extends Controller
                     "sale_description" => request("sale_description"),
                     "sale_invoice" => $fileName,
                     "sale_date" => $dateTime,
+                    "payment_status" => $paymentStatus,
                 ]);
             } else {
                 Sale::create([
@@ -188,6 +192,7 @@ class SalesController extends Controller
                     "sale_total" => (int) request("sale_total"),
                     "sale_description" => request("sale_description"),
                     "sale_date" => $dateTime,
+                    "payment_status" => $paymentStatus,
                 ]);
             }
 
@@ -285,6 +290,25 @@ class SalesController extends Controller
             return response()->json([
                 "status" => true,
                 "message" => "Sales submitted successfully",
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => $th->getMessage(),
+            ]);
+        }
+    }
+
+    public function pay($id)
+    {
+        try {
+            Sale::where("sale_id", $id)->update([
+                "payment_status" => "Lunas",
+            ]);
+
+            return response()->json([
+                "status" => true,
+                "message" => "Sales payment status updated to Lunas",
             ]);
         } catch (\Throwable $th) {
             return response()->json([

@@ -26,6 +26,7 @@ class Sale extends Model
         'sale_invoice',
         "sale_date",
         "sale_reject_message",
+        "payment_status",
         "created_at",
         "updated_at",
     ];
