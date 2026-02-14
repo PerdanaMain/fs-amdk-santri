@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\PurchaseExport;
 use App\Models\Finance;
+use App\Models\Payment;
 use App\Models\Purchase;
 use App\Models\Stock;
 use Illuminate\Http\Request;
@@ -26,12 +27,14 @@ class PurchaseController extends Controller
             ->where("status_id", "!=", 4)
             ->get();
         $stocks = Stock::all();
+        $payments = Payment::all();
 
         return view(
             'pages.dashboard.purchase',
             compact(
                 'purchases',
-                "stocks"
+                "stocks",
+                "payments"
             )
         );
     }
@@ -49,6 +52,7 @@ class PurchaseController extends Controller
             "stock:stocks.*",
         ])
             ->where("status_id", 4)
+            ->where("payment_status", "Lunas")
             ->get();
 
         return view(
@@ -109,9 +113,12 @@ class PurchaseController extends Controller
             "purchase_total" => "required|numeric",
             "purchase_description" => "required",
             "purchase_status" => "required",
+            "payment_id" => "required",
         ]);
 
         $user = session()->get("user");
+        $paymentStatus = ((int)request("payment_id") == 1) ? 'Lunas' : 'Belum Lunas';
+
         Purchase::create([
             "stock_id" => (int) request("stock_id"),
             "user_id" => (int) $user->user_id,
@@ -120,6 +127,8 @@ class PurchaseController extends Controller
             "purchase_price" => (int) request("purchase_price"),
             "purchase_quantity" => (int) request("purchase_quantity"),
             "purchase_description" => request("purchase_description"),
+            "payment_id" => (int) request("payment_id"),
+            "payment_status" => $paymentStatus,
         ]);
 
         return back()->with('purchase.success', 'Data pembelian berhasil ditambahkan.');
@@ -134,9 +143,11 @@ class PurchaseController extends Controller
             "purchase_price" => "required|numeric",
             "purchase_description" => "required",
             "purchase_status" => "required",
+            "payment_id" => "required",
         ]);
 
         $purchase_total = (int) request("purchase_quantity") * (int) request("purchase_price");
+        $paymentStatus = ((int)request("payment_id") == 1) ? 'Lunas' : 'Belum Lunas';
 
         $purchase = Purchase::where("purchase_id", $id);
         $purchase->update([
@@ -146,9 +157,32 @@ class PurchaseController extends Controller
             "purchase_price" => (int) request("purchase_price"),
             "purchase_quantity" => (int) request("purchase_quantity"),
             "purchase_description" => request("purchase_description"),
+            "payment_id" => (int) request("payment_id"),
+            "payment_status" => $paymentStatus,
         ]);
 
         return back()->with('purchase.success', 'Data pembelian berhasil diubah.');
+    }
+
+    public function pay($id)
+    {
+        try {
+            $purchase = Purchase::where("purchase_id", $id);
+            $purchase->update([
+                "payment_status" => "Lunas",
+            ]);
+
+            return response()->json([
+                "status" => true,
+                "message" => "Status pembayaran berhasil diubah.",
+            ])->setStatusCode(200);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => "Status pembayaran gagal diubah.",
+            ])->setStatusCode(500);
+        }
     }
 
     public function destroy($id)

@@ -85,6 +85,7 @@
                                         <th>Harga Satuan</th>
                                         <th>Total Harga</th>
                                         <th>Status</th>
+                                        <th>Status Pembayaran</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -132,6 +133,12 @@
                                                             {{ $p->status->status_description }}
                                                         </label>
                                                 @endswitch
+                                            </td>
+                                            <td>
+                                                <label
+                                                    class="badge {{ $p->payment_status == 'Lunas' ? 'badge-success' : 'badge-danger' }}">
+                                                    {{ $p->payment_status }}
+                                                </label>
                                             </td>
                                             <td>
                                                 <a class="nav-link" id="StockDropdown" href="#"
@@ -202,6 +209,15 @@
                                                                 @endif
                                                             </div>
                                                             <div class="col-md-12 col-sm-12">
+                                                                <p class="mb-2"><b>Metode Pembayaran:</b>
+                                                                    {{ $p->payment ? $p->payment->payment_name : '-' }}
+                                                                </p>
+                                                                <p class="mb-2"><b>Status Pembayaran:</b>
+                                                                    <label
+                                                                        class="badge {{ $p->payment_status == 'Lunas' ? 'badge-success' : 'badge-danger' }}">
+                                                                        {{ $p->payment_status }}
+                                                                    </label>
+                                                                </p>
                                                                 <p class="mb-2"><b>Status:</b>
                                                                     <label
                                                                         class="badge 

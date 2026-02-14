@@ -51,16 +51,14 @@
                                                                 *</span></label>
                                                         <textarea name="purchase_description" class="form-control" cols="30" rows="10"></textarea>
                                                     </div>
+                                                    <div class="form-group">
+                                                        <label for="stock_id">Jumlah Barang <span
+                                                                style="color: red">
+                                                                *</span></label>
+                                                        <input class="form-control" type="text"
+                                                            name="purchase_quantity" id="purchase_quantity">
+                                                    </div>
                                                     <div class="row">
-                                                        <div class="col-md-6 col-sm-12">
-                                                            <div class="form-group">
-                                                                <label for="stock_id">Jumlah Barang <span
-                                                                        style="color: red">
-                                                                        *</span></label>
-                                                                <input class="form-control" type="text"
-                                                                    name="purchase_quantity" id="purchase_quantity">
-                                                            </div>
-                                                        </div>
                                                         <div class="col-md-6 col-sm-12">
                                                             <div class="form-group">
                                                                 <label for="stock_id">Harga Satuan / <span
@@ -68,6 +66,21 @@
                                                                         *</span></label>
                                                                 <input class="form-control" type="text"
                                                                     name="purchase_price" id="purchase_price">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6 col-sm-12">
+                                                            <div class="form-group">
+                                                                <label for="payment_id">Pembayaran <span
+                                                                        style="color:red">*</span></label>
+                                                                <select id="payment_id" class="form-select"
+                                                                    name="payment_id">
+                                                                    <option selected hidden>=== Pilih Pembayaran ===
+                                                                    </option>
+                                                                    @foreach ($payments as $payment)
+                                                                        <option value="{{ $payment->payment_id }}">
+                                                                            {{ $payment->payment_name }}</option>
+                                                                    @endforeach
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -117,6 +130,7 @@
                                         <th>Harga Satuan</th>
                                         <th>Total Harga</th>
                                         <th>Status</th>
+                                        <th>Status Pembayaran</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -142,6 +156,12 @@
                                                 </label>
                                             </td>
                                             <td>
+                                                <label
+                                                    class="badge {{ $p->payment_status == 'Lunas' ? 'badge-success' : 'badge-danger' }}">
+                                                    {{ $p->payment_status }}
+                                                </label>
+                                            </td>
+                                            <td>
                                                 <a class="nav-link" id="StockDropdown" href="#"
                                                     data-bs-toggle="dropdown" aria-expanded="false">
                                                     <i class="mdi mdi-dots-vertical"></i>
@@ -152,6 +172,13 @@
                                                         data-bs-target="#infoModal-{{ $p->purchase_id }}"><i
                                                             class="dropdown-item-icon mdi mdi-information-outline me-2"></i>
                                                         Info </button>
+
+                                                    @if ($p->payment_status == 'Belum Lunas')
+                                                        <button class="dropdown-item" id="pay_purchase"
+                                                            data-id="{{ $p->purchase_id }}"><i
+                                                                class="dropdown-item-icon mdi mdi-cash-multiple me-2"></i>
+                                                            Bayar</button>
+                                                    @endif
 
                                                     @if ($p->status->status_id == 6)
                                                         <button class="dropdown-item" data-bs-toggle="modal"
@@ -249,6 +276,9 @@
 
                                                                 <p><b>Diajukan Oleh:</b>
                                                                     {{ $p->user->user_name }}
+                                                                </p>
+                                                                <p><b>Metode Pembayaran:</b>
+                                                                    {{ $p->payment ? $p->payment->payment_name : '-' }}
                                                                 </p>
                                                             </div>
                                                             <div class="col-md-6 col-sm-12">
@@ -351,6 +381,24 @@
                                                                                 name="purchase_price"
                                                                                 id="purchase_price_update"
                                                                                 value="{{ $p->purchase_price }}">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6 col-sm-12">
+                                                                        <div class="form-group">
+                                                                            <label for="payment_id">Pembayaran <span
+                                                                                    style="color:red">*</span></label>
+                                                                            <select id="payment_id" class="form-select"
+                                                                                name="payment_id">
+                                                                                <option selected hidden
+                                                                                    value="{{ $p->payment_id }}">
+                                                                                    {{ $p->payment ? $p->payment->payment_name : '=== Pilih Pembayaran ===' }}
+                                                                                </option>
+                                                                                @foreach ($payments as $payment)
+                                                                                    <option value="{{ $payment->payment_id }}">
+                                                                                        {{ $payment->payment_name }}
+                                                                                    </option>
+                                                                                @endforeach
+                                                                            </select>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -621,6 +669,46 @@
                 }
             })
         });
+
+        $(document).on("click", "#pay_purchase", function() {
+            var purchase_id = $(this).data('id');
+
+            Swal.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin mengubah status pembayaran menjadi Lunas?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Bayar!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/purchase/pay/" + purchase_id,
+                        type: 'PATCH',
+                        data: {
+                            _token: $("input[name=_token]").val()
+                        },
+                        success: function(response) {
+                            if (response.status == true) {
+                                Swal.fire(
+                                    'Berhasil!',
+                                    response.message,
+                                    'success'
+                                )
+                                location.reload();
+                            } else {
+                                Swal.fire(
+                                    'Gagal!',
+                                    response.message,
+                                    'error'
+                                )
+                            }
+                        }
+                    });
+                }
+            })
+        })
     </script>
 
     @if ($errors->any())

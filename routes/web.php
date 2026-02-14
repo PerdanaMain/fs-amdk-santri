@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DebtController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\ProfileController;
@@ -107,6 +108,7 @@ Route::group(["prefix" => "/"], function () {
             Route::put("/{id}", [PurchaseController::class, "update"])->name("purchase.update");
             Route::delete("/{id}", [PurchaseController::class, "destroy"])->name("purchase.destroy");
             Route::patch("/{id}", [PurchaseController::class, "submit"])->name("purchase.submission");
+            Route::patch("/pay/{id}", [PurchaseController::class, "pay"])->name("purchase.pay");
             Route::put("/approve/{id}", [PurchaseController::class, "approve"])->name("purchase.approve");
             Route::put("/reject/{id}", [PurchaseController::class, "reject"])->name("purchase.reject");
         });
@@ -117,6 +119,11 @@ Route::group(["prefix" => "/"], function () {
         Route::prefix("history-sales")->group(function () {
             Route::get("/", [SalesController::class, "history"])->name("salesHistory");
             Route::post("/export", [SalesController::class, "export"])->name("salesHistory.export");
+        });
+
+        Route::prefix("debts")->group(function () {
+            Route::get("/payable", [DebtController::class, "indexHutang"])->name("debts.payable");
+            Route::get("/receivable", [DebtController::class, "indexPiutang"])->name("debts.receivable");
         });
 
         Route::prefix("sales")->group(function () {

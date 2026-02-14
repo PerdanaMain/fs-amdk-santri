@@ -57,6 +57,22 @@
                 </a>
             </li>
         @endif
+        
+        @if (in_array(session()->get('user')->role_id, [1, 2, 5, 6]))
+            <li class="nav-item nav-category">Tagihan</li>
+            <li class="nav-item {{ Route::currentRouteName() == 'debts.payable' ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('debts.payable') }}">
+                    <i class="mdi mdi-cash-multiple menu-icon"></i>
+                    <span class="menu-title">Hutang</span>
+                </a>
+            </li>
+            <li class="nav-item {{ Route::currentRouteName() == 'debts.receivable' ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('debts.receivable') }}">
+                    <i class="mdi mdi-cash-usd menu-icon"></i>
+                    <span class="menu-title">Piutang</span>
+                </a>
+            </li>
+        @endif
         @if (in_array(session()->get('user')->role_id, [1, 2, 3, 5, 6]))
             <li class="nav-item nav-category">Shipments</li>
             <li class="nav-item {{ Route::currentRouteName() == 'visit' ? 'active' : '' }}">

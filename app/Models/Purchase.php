@@ -19,6 +19,7 @@ class Purchase extends Model
         "finance_id",
         "customer_id",
         "payment_id",
+        "payment_status",
         'purchase_description',
         'purchase_quantity',
         'purchase_price',
@@ -43,5 +44,9 @@ class Purchase extends Model
     public function finance(): BelongsTo
     {
         return $this->belongsTo(Finance::class, 'finance_id', 'finance_id');
+    }
+    public function payment(): BelongsTo
+    {
+        return $this->belongsTo(Payment::class, 'payment_id', 'payment_id');
     }
 }
