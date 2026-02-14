@@ -77,6 +77,46 @@ class DashboardController extends Controller
             ],
         ];
 
+        $summaryData = [
+            'labels' => ['Penjualan', 'Pembelian'],
+            'data' => [$sales, $purchases],
+            'colors' => ['#4B49AC', '#FFC100']
+        ];
+
+        // Yearly Data Calculation (Last 5 Years)
+        $currentYear = Carbon::now()->year;
+        $yearlyLabels = [];
+        $yearlySales = [];
+        $yearlyPurchases = [];
+
+        for ($i = 4; $i >= 0; $i--) {
+            $year = $currentYear - $i;
+            $yearlyLabels[] = $year;
+            
+            $startOfYear = Carbon::create($year, 1, 1)->startOfYear();
+            $endOfYear = Carbon::create($year, 12, 31)->endOfYear();
+
+            $yearlySales[] = Sale::whereBetween('created_at', [$startOfYear, $endOfYear])->count();
+            $yearlyPurchases[] = Purchase::whereBetween('created_at', [$startOfYear, $endOfYear])->count();
+        }
+
+        $yearlyChartData = [
+            'labels' => $yearlyLabels,
+            'sales' => $yearlySales,
+            'purchases' => $yearlyPurchases
+        ];
+
+        // Debt and Receivable Calculation
+        // Hutang (Payable) -> Belum Lunas Purchases
+        $totalPayable = Purchase::where("payment_status", "Belum Lunas")
+            ->where("status_id", "!=", 5)
+            ->sum('purchase_total');
+
+        // Piutang (Receivable) -> Belum Lunas Sales
+        $totalReceivable = Sale::where("payment_status", "Belum Lunas")
+            ->where("status_id", "!=", 5)
+            ->sum('sale_total');
+
         return view(
             'pages.dashboard.index',
             compact(
@@ -85,7 +125,11 @@ class DashboardController extends Controller
                 "sales",
                 "purchases",
                 "recentSales",
-                "chartData"
+                "chartData",
+                "summaryData",
+                "yearlyChartData",
+                "totalPayable",
+                "totalReceivable"
             )
         );
     }
