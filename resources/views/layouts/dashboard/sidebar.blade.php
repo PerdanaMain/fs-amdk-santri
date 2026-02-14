@@ -99,6 +99,12 @@
                     <span class="menu-title">Keuangan</span>
                 </a>
             </li>
+            <li class="nav-item {{ Route::currentRouteName() == 'assets.index' ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('assets.index') }}">
+                    <i class="mdi mdi-cube-outline menu-icon"></i>
+                    <span class="menu-title">Aset</span>
+                </a>
+            </li>
         @endif
 
         @if (in_array(session()->get('user')->role_id, [1, 2, 5, 6]))

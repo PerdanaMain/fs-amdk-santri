@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AssetController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
@@ -67,12 +68,20 @@ Route::group(["prefix" => "/"], function () {
         Route::get('/dashboard', [DashboardController::class, "index"])->name('dashboard');
         Route::delete("/feedbacks/{id}", [LoginController::class, "feedbackDestroy"])->name("feedbacks.destroy");
 
-        Route::prefix('stocks')->group(function () {
+        Route::prefix("stocks")->group(function () {
             Route::get('/', [StockController::class, 'index'])->name('stocks.index');
             Route::post('/', [StockController::class, 'store'])->name('stocks.store');
 
             Route::put('/{id}', [StockController::class, 'update'])->name('stocks.update');
             Route::delete('/{id}', [StockController::class, 'destroy'])->name('stocks.destroy');
+        });
+
+        Route::prefix("company-assets")->group(function () {
+            Route::get('/', [AssetController::class, 'index'])->name('assets.index');
+            Route::post('/', [AssetController::class, 'store'])->name('assets.store');
+            Route::post('/export', [AssetController::class, 'export'])->name('assets.export');
+            Route::put('/{id}', [AssetController::class, 'update'])->name('assets.update');
+            Route::delete('/{id}', [AssetController::class, 'destroy'])->name('assets.destroy');
         });
 
         Route::prefix("customers")->group(function () {
