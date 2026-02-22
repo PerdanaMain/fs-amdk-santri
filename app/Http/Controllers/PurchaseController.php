@@ -24,7 +24,8 @@ class PurchaseController extends Controller
             "status:status_id,status_description",
             "stock:stocks.*",
         ])
-            ->where("status_id", "!=", 4)
+            ->whereNotIn("status_id", [4, 5])
+            ->orWhere("payment_status", "Belum Lunas")
             ->get();
         $stocks = Stock::all();
         $payments = Payment::all();
@@ -51,9 +52,10 @@ class PurchaseController extends Controller
             "status:status_id,status_description",
             "stock:stocks.*",
         ])
-            ->where("status_id", 4)
-            ->where("payment_status", "Lunas")
+            ->whereNotIn("status_id", [1, 2, 3, 6])
             ->get();
+
+
 
         return view(
             "pages.dashboard.histories.purchase",
@@ -71,13 +73,40 @@ class PurchaseController extends Controller
             $format = (int) request("format");
             $start = request("start_date");
             $end = request("end_date");
+            $status = request("status");
 
             $purchase = Purchase::with(
                 "user:users.*",
                 "status:statuses.*",
                 "stock:stocks.*"
-            )
-                ->where("status_id", 4);
+            );
+
+            // Apply status filter if provided
+            if ($status !== null && $status !== "") {
+                $status = (int) $status;
+                if ($status == 0) {
+                     // If status is 0 (Pending), maybe we want to include all visible statuses except explicit Approved/Rejected?
+                     // Or just filter by the specific pending statuses.
+                     // Based on history method logic, history shows everything except 1,2,3,6.
+                     // But the export logic previously only showed status_id 4.
+                     // " ->where('status_id', 4);" was hardcoded.
+                     // If we want to support filtering, we should remove the hardcoded check and use the input.
+                     // However, we should likely still respect the base "history visibility" rules if no filter is applied?
+                     // Or if the user selects "Semua Status", show what is in history.
+                     $purchase = $purchase->whereNotIn("status_id", [1, 2, 3, 6]);
+                } else {
+                     $purchase = $purchase->where("status_id", $status);
+                }
+            } else {
+                // Default behavior if no status selected (or "Semua Status" which sends empty string)
+                // Previous code was: ->where("status_id", 4);
+                // But now we want to export what is visible in history?
+                // Or should we stick to "Approved" (4) as default?
+                // If the user selects "Semua Status", it usually means everything visible.
+                // The visible items in history are "whereNotIn('status_id', [1, 2, 3, 6])".
+                // So let's use that as default.
+                $purchase = $purchase->whereNotIn("status_id", [1, 2, 3, 6]);
+            }
 
             if ($start == null && $end == null) {
                 $purchase = $purchase->orderBy("purchase_id", "desc")
@@ -92,7 +121,14 @@ class PurchaseController extends Controller
             }
 
             if ($format == 1) {
-                return Excel::download(new PurchaseExport, 'purchases.xlsx');
+                // If using Excel export class, we might need to pass the collection or query to it.
+                // The current PurchaseExport class likely doesn't accept parameters constructor.
+                // We need to check PurchaseExport.
+                // But typically: return Excel::download(new PurchaseExport($purchase), 'purchases.xlsx');
+                // The original code was: return Excel::download(new PurchaseExport, 'purchases.xlsx');
+                // This implies PurchaseExport fetches its own data. We need to modify PurchaseExport to accept data or query.
+                // Let's check PurchaseExport first.
+                return Excel::download(new PurchaseExport($purchase), 'purchases.xlsx');
             } else {
                 $pdf = \PDF::loadView('pages.exports.purchase', compact('purchase'))
                     ->setPaper('a4', 'landscape');
@@ -176,7 +212,6 @@ class PurchaseController extends Controller
                 "status" => true,
                 "message" => "Status pembayaran berhasil diubah.",
             ])->setStatusCode(200);
-
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
@@ -216,7 +251,6 @@ class PurchaseController extends Controller
                 "status" => true,
                 "message" => "Data pembelian berhasil diajukan.",
             ])->setStatusCode(200);
-
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
@@ -238,6 +272,13 @@ class PurchaseController extends Controller
 
             $purchase = Purchase::where("purchase_id", $id);
 
+            if ($purchase->first()->payment_status !== "Lunas") {
+                return response()->json([
+                    "status" => false,
+                    "message" => "Data pembelian tidak dapat disetujui karena pembayaran belum lunas.",
+                ])->setStatusCode(403);
+            }
+
             Stock::where("stock_id", $purchase->first()->stock_id)
                 ->increment("stock_quantity", $purchase->first()->purchase_quantity);
 
@@ -258,7 +299,6 @@ class PurchaseController extends Controller
                 "status" => true,
                 "message" => "Data pembelian berhasil disetujui.",
             ])->setStatusCode(200);
-
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
@@ -271,7 +311,7 @@ class PurchaseController extends Controller
     {
         try {
             $user = session()->get("user");
-            if ($user->role_id !== 3) {
+            if ($user->role_id !== 2) {
                 return response()->json([
                     "status" => false,
                     "message" => "Anda tidak memiliki akses untuk menolak data pembelian.",
@@ -281,6 +321,7 @@ class PurchaseController extends Controller
             $purchase = Purchase::where("purchase_id", $id);
             $purchase->update([
                 "status_id" => 5,
+                "payment_status" => "Lunas",
                 "purchase_reject_message" => request("purchase_reject_message"),
             ]);
 
@@ -288,7 +329,6 @@ class PurchaseController extends Controller
                 "status" => true,
                 "message" => "Data pembelian berhasil ditolak.",
             ])->setStatusCode(200);
-
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,

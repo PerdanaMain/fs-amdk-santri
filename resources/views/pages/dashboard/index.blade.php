@@ -48,8 +48,8 @@
                                                 <div class="card card-rounded">
                                                     <div class="card-body">
                                                         <p class="statistics-title">Purchasing Products</p>
-                                                        <div class="d-flex">
-                                                            <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
                                                                 <h3 class="rate-percentage">{{ $purchases }}</h3>
                                                                 <p class="text-primary d-flex"><span>Data
                                                                         Transactions</span>
@@ -62,6 +62,13 @@
                                                                         Purchasing</span>
                                                                 </p>
                                                             </div>
+                                                            <div class="col-md-6">
+                                                                <h3 class="rate-percentage">
+                                                                    Rp {{ number_format($totalPayable, 0, ',', '.') }}</h3>
+                                                                <p class="text-primary d-flex"><span>Total
+                                                                        Hutang</span>
+                                                                </p>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -70,8 +77,8 @@
                                                 <div class="card card-rounded">
                                                     <div class="card-body">
                                                         <p class="statistics-title">Selling Products</p>
-                                                        <div class="d-flex">
-                                                            <div class="col-md-6">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
                                                                 <h3 class="rate-percentage">{{ $sales }}</h3>
                                                                 <p class="text-primary d-flex"><span>Data
                                                                         Transactions</span>
@@ -82,6 +89,13 @@
                                                                     Rp {{ number_format($totalSale, 0, ',', '.') }}</h3>
                                                                 <p class="text-primary d-flex"><span>Total
                                                                         Selling</span>
+                                                                </p>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <h3 class="rate-percentage">
+                                                                    Rp {{ number_format($totalReceivable, 0, ',', '.') }}</h3>
+                                                                <p class="text-primary d-flex"><span>Total
+                                                                        Piutang </span>
                                                                 </p>
                                                             </div>
                                                         </div>

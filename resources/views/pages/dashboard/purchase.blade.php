@@ -5,6 +5,18 @@
 @endsection
 
 @section('content.dashboard')
+    <style>
+        .select2-search--dropdown .select2-search__field {
+            background-color: #e9ecef !important;
+            color: #333 !important;
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected],
+        .select2-container--bootstrap .select2-results__option--highlighted[aria-selected] {
+            background-color: #f8f9fa !important;
+            color: #333 !important;
+        }
+    </style>
     <div class="content-wrapper">
         <div class="row">
             <div class="col-lg-12 grid-margin stretch-card">
@@ -36,7 +48,7 @@
                                                         <label for="stock_id">Nama Barang <span style="color: red">
                                                                 *</span></label>
                                                         <select id="stock_select" class="form-select" name="stock_id">
-                                                            <option selected hidden>=== Pilih Barang === </option>
+                                                            <option></option>
                                                             @foreach ($stocks as $stock)
                                                                 <option value={{ $stock->stock_id }}
                                                                     data-satuan={{ $stock->stock_satuan }}>
@@ -52,11 +64,10 @@
                                                         <textarea name="purchase_description" class="form-control" cols="30" rows="10"></textarea>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label for="stock_id">Jumlah Barang <span
-                                                                style="color: red">
+                                                        <label for="stock_id">Jumlah Barang <span style="color: red">
                                                                 *</span></label>
-                                                        <input class="form-control" type="text"
-                                                            name="purchase_quantity" id="purchase_quantity">
+                                                        <input class="form-control" type="text" name="purchase_quantity"
+                                                            id="purchase_quantity">
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-md-6 col-sm-12">
@@ -129,6 +140,7 @@
                                         <th>Jumlah Pembelian</th>
                                         <th>Harga Satuan</th>
                                         <th>Total Harga</th>
+                                        <th>Tgl Transaksi</th>
                                         <th>Status</th>
                                         <th>Status Pembayaran</th>
                                         <th>Actions</th>
@@ -141,6 +153,8 @@
                                             <td>{{ $p->purchase_quantity }} {{ $p->stock->stock_satuan }}</td>
                                             <td>Rp {{ number_format($p->purchase_price, 0, ',', '.') }}</td>
                                             <td>Rp {{ number_format($p->purchase_total, 0, ',', '.') }}</td>
+                                            <td>{{ $p->created_at->setTimezone('Asia/Jakarta')->format('d-m-Y H:i:s') }}
+                                            </td>
                                             <td>
                                                 <label
                                                     class="badge 
@@ -174,10 +188,12 @@
                                                         Info </button>
 
                                                     @if ($p->payment_status == 'Belum Lunas')
-                                                        <button class="dropdown-item" id="pay_purchase"
-                                                            data-id="{{ $p->purchase_id }}"><i
-                                                                class="dropdown-item-icon mdi mdi-cash-multiple me-2"></i>
-                                                            Bayar</button>
+                                                        @if (in_array(auth()->user()->role_id, [1, 2]))
+                                                            <button class="dropdown-item" id="pay_purchase"
+                                                                data-id="{{ $p->purchase_id }}"><i
+                                                                    class="dropdown-item-icon mdi mdi-cash-multiple me-2"></i>
+                                                                Bayar</button>
+                                                        @endif
                                                     @endif
 
                                                     @if ($p->status->status_id == 6)
@@ -394,7 +410,8 @@
                                                                                     {{ $p->payment ? $p->payment->payment_name : '=== Pilih Pembayaran ===' }}
                                                                                 </option>
                                                                                 @foreach ($payments as $payment)
-                                                                                    <option value="{{ $payment->payment_id }}">
+                                                                                    <option
+                                                                                        value="{{ $payment->payment_id }}">
                                                                                         {{ $payment->payment_name }}
                                                                                     </option>
                                                                                 @endforeach
@@ -449,6 +466,30 @@
     <script>
         $(document).ready(function() {
             $('#table-purchase').DataTable();
+
+            $('#addModal #stock_select').select2({
+                dropdownParent: $('#addModal'),
+                placeholder: '=== Pilih Barang ===',
+                width: '100%',
+                templateResult: function(data) {
+                    if (!data.id) {
+                        return data.text;
+                    }
+                    var satuan = $(data.element).data('satuan');
+
+                    var $result = $(
+                        '<div style="padding: 4px;">' +
+                        '<div style="font-weight: bold; font-size: 1.1em;">' + data.text +
+                        '</div>' +
+                        '<div style="font-size: 0.9em; color: #555; margin-top: 4px;">' +
+                        'Satuan: ' + (satuan ?
+                            satuan : '-') +
+                        '</div>' +
+                        '</div>'
+                    );
+                    return $result;
+                }
+            });
         });
 
         $(document).ready(function() {
@@ -621,10 +662,18 @@
                             } else {
                                 Swal.fire(
                                     'Failed!',
-                                    response.message,
+                                    response.responseJSON.message,
                                     'error'
                                 )
                             }
+                        },
+                        error: function(response) {
+                            console.log(response);
+                            Swal.fire(
+                                'Failed!',
+                                response.message,
+                                'error'
+                            )
                         }
                     });
                 }
@@ -704,6 +753,14 @@
                                     'error'
                                 )
                             }
+                        },
+                        error: function(response) {
+                            console.log(response);
+                            Swal.fire(
+                                'Gagal!',
+                                response.message,
+                                'error'
+                            )
                         }
                     });
                 }

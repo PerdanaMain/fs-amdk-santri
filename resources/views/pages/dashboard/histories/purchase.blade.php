@@ -46,6 +46,17 @@
                                                                 <input type="date" class="form-control" name="end_date">
                                                             </div>
                                                         </div>
+                                                        <div class="col-md-12 col-sm-12">
+                                                            <div class="form-group">
+                                                                <label for="status">Filter Status </label>
+                                                                <select class="form-control" name="status">
+                                                                    <option value="">Semua Status</option>
+                                                                    <option value="4">Approved</option>
+                                                                    <option value="0">Pending</option>
+                                                                    <option value="5">Rejected</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
                                                         <div class="col-md-12 col-sm12">
                                                             <div class="form-group mb-3">
                                                                 <label for="start_date">Format Export</label>
@@ -106,7 +117,7 @@
 
                                                     @case(2)
                                                         <label for="status" class="badge badge-success">
-                                                            Done
+                                                            Approved
                                                         </label>
                                                     @break
 
@@ -118,7 +129,7 @@
 
                                                     @case(4)
                                                         <label for="status" class="badge badge-success">
-                                                            Done
+                                                            Approved
                                                         </label>
                                                     @break
 
