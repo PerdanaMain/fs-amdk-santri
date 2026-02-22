@@ -14,9 +14,11 @@
                         <div class="d-block my-4">
                             <button type="button" class="btn btn-primary me-2 mb-3" data-bs-toggle="modal"
                                 data-bs-target="#addModal">Add Employee</button>
-
-                            <button type="button" class="btn btn-success me-2 mb-3" data-bs-toggle="modal"
-                                data-bs-target="#exportModal">Export Employee</button>
+                                
+                            @if (auth()->user()->role_id == 2)
+                                <button type="button" class="btn btn-success me-2 mb-3" data-bs-toggle="modal"
+                                    data-bs-target="#exportModal">Export Employee</button>
+                            @endif
 
                             {{-- Add modal --}}
                             <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel"
@@ -166,7 +168,8 @@
                                                                 <div class="row">
                                                                     <div class="col-md-6 col-sm-12">
                                                                         <input type="radio" name="format"
-                                                                            id="format" value="1" checked> Excel
+                                                                            id="format" value="1" checked>
+                                                                        Excel
                                                                     </div>
                                                                     <div class="col-md-6 col-sm-12">
                                                                         <input type="radio" name="format"
@@ -196,8 +199,8 @@
                                 <thead>
                                     <tr>
                                         <th>Foto Employee</th>
-                                        <th>Hak Akses</th>
                                         <th>Nama Employee</th>
+                                        <th>Hak Akses</th>
                                         <th>No Telp</th>
                                         <th>Alamat</th>
                                         <th>Status</th>

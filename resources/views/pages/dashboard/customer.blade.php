@@ -233,6 +233,7 @@
                                         <th>Foto Customer</th>
                                         <th>Nama Customer</th>
                                         <th>Nama Pemilik</th>
+                                        <th>Alamat</th>
                                         <th>Transaksi</th>
                                         <th>Lokasi</th>
                                         <th>Petugas</th>
@@ -253,6 +254,9 @@
                                             </td>
                                             <td>{{ $c->customer_name }}</td>
                                             <td>{{ $c->customer_owner }}</td>
+                                            <td class="text-truncate" style="max-width: 250px;">
+                                                {{ $c->customer_address }}
+                                            </td>
                                             <td>
                                                 @if (count($c->sales) > 0)
                                                     <button type="button" class="btn btn-danger me-2"
@@ -278,7 +282,8 @@
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-right navbar-dropdown"
                                                     aria-labelledby="StockDropdown">
-                                                    <a class="dropdown-item" href="{{ route('customer.show', $c->customer_id) }}">
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('customer.show', $c->customer_id) }}">
                                                         <i class="dropdown-item-icon mdi mdi-information-outline me-2"></i>
                                                         Info
                                                     </a>

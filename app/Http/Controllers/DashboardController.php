@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Purchase;
 use App\Models\Sale;
+use App\Models\Stock;
 use App\Models\User;
 use Carbon\Carbon;
 
@@ -16,11 +17,15 @@ class DashboardController extends Controller
         $users = User::all()->count();
         $customers = Customer::all()->count();
         $sales = Sale::where("status_id", 2)->get()->count();
+        $totalSale = Sale::where("status_id", 2)->sum("sale_total");
         $purchases = Purchase::where("status_id", 4)->get()->count();
+        $totalPurchase = Purchase::where("status_id", 4)->sum("purchase_total");
 
-        $recentSales = Sale::with(
-            "stock:stocks.*",
-        )->where("status_id", 2)->orderBy("created_at", "desc")->limit(5)->get();
+        $products = Stock::withCount(['sales as total_sale_data' => function ($q) {
+            $q->where('status_id', 2);
+        }])->withSum(['sales as total_sale_transactions' => function ($q) {
+            $q->where('status_id', 2);
+        }], 'sale_total')->get();
 
         $salesByMonth = [];
         $purchaseByMonth = [];
@@ -28,8 +33,8 @@ class DashboardController extends Controller
             $startOfMonth = Carbon::create(null, $month, 1)->startOfMonth();
             $endOfMonth = Carbon::create(null, $month, 1)->endOfMonth();
 
-            $salesByMonth[$startOfMonth->format('F')] = Sale::whereBetween('created_at', [$startOfMonth, $endOfMonth])->count();
-            $purchaseByMonth[$startOfMonth->format('F')] = Purchase::whereBetween('created_at', [$startOfMonth, $endOfMonth])->count();
+            $salesByMonth[$startOfMonth->format('F')] = Sale::whereBetween('created_at', [$startOfMonth, $endOfMonth])->sum("sale_total");
+            $purchaseByMonth[$startOfMonth->format('F')] = Purchase::whereBetween('created_at', [$startOfMonth, $endOfMonth])->sum("purchase_total");
         }
 
         $chartData = [
@@ -77,10 +82,21 @@ class DashboardController extends Controller
             ],
         ];
 
+        // Debt and Receivable Calculation
+        // Hutang (Payable) -> Belum Lunas Purchases
+        $totalPayable = Purchase::where("payment_status", "Belum Lunas")
+            ->where("status_id", "!=", 5)
+            ->sum('purchase_total');
+
+        // Piutang (Receivable) -> Belum Lunas Sales
+        $totalReceivable = Sale::where("payment_status", "Belum Lunas")
+            ->where("status_id", "!=", 5)
+            ->sum('sale_total');
+
         $summaryData = [
-            'labels' => ['Penjualan', 'Pembelian'],
-            'data' => [$sales, $purchases],
-            'colors' => ['#4B49AC', '#FFC100']
+            'labels' => ['Penjualan', 'Pembelian', 'Hutang', 'Piutang'],
+            'data' => [$totalSale, $totalPurchase, $totalPayable, $totalReceivable],
+            'colors' => ['#1F3BB3', '#FFAB00', '#FF4747', '#00D25B']
         ];
 
         // Yearly Data Calculation (Last 5 Years)
@@ -96,8 +112,8 @@ class DashboardController extends Controller
             $startOfYear = Carbon::create($year, 1, 1)->startOfYear();
             $endOfYear = Carbon::create($year, 12, 31)->endOfYear();
 
-            $yearlySales[] = Sale::whereBetween('created_at', [$startOfYear, $endOfYear])->count();
-            $yearlyPurchases[] = Purchase::whereBetween('created_at', [$startOfYear, $endOfYear])->count();
+            $yearlySales[] = Sale::whereBetween('created_at', [$startOfYear, $endOfYear])->sum('sale_total');
+            $yearlyPurchases[] = Purchase::whereBetween('created_at', [$startOfYear, $endOfYear])->sum('purchase_total');
         }
 
         $yearlyChartData = [
@@ -106,17 +122,6 @@ class DashboardController extends Controller
             'purchases' => $yearlyPurchases
         ];
 
-        // Debt and Receivable Calculation
-        // Hutang (Payable) -> Belum Lunas Purchases
-        $totalPayable = Purchase::where("payment_status", "Belum Lunas")
-            ->where("status_id", "!=", 5)
-            ->sum('purchase_total');
-
-        // Piutang (Receivable) -> Belum Lunas Sales
-        $totalReceivable = Sale::where("payment_status", "Belum Lunas")
-            ->where("status_id", "!=", 5)
-            ->sum('sale_total');
-
         return view(
             'pages.dashboard.index',
             compact(
@@ -124,12 +129,14 @@ class DashboardController extends Controller
                 "customers",
                 "sales",
                 "purchases",
-                "recentSales",
                 "chartData",
+                "products",
                 "summaryData",
                 "yearlyChartData",
                 "totalPayable",
-                "totalReceivable"
+                "totalReceivable",
+                "totalSale",
+                "totalPurchase"
             )
         );
     }

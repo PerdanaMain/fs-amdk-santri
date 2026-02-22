@@ -41,7 +41,8 @@
 <!-- endbuild -->
 
 <!-- Vendors JS -->
-<script src="vendor/libs/apex-charts/apexcharts.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
 <script src="vendor/libs/swiper/swiper.js"></script>
 <script src="vendor/libs/datatables-bs5/datatables-bootstrap5.js"></script>
 
