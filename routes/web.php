@@ -71,6 +71,7 @@ Route::group(["prefix" => "/"], function () {
         Route::prefix("stocks")->group(function () {
             Route::get('/', [StockController::class, 'index'])->name('stocks.index');
             Route::post('/', [StockController::class, 'store'])->name('stocks.store');
+            Route::post('/export', [StockController::class, 'export'])->name('stocks.export');
 
             Route::put('/{id}', [StockController::class, 'update'])->name('stocks.update');
             Route::delete('/{id}', [StockController::class, 'destroy'])->name('stocks.destroy');
@@ -114,6 +115,7 @@ Route::group(["prefix" => "/"], function () {
             Route::get("/", [PurchaseController::class, "index"])->name('purchase');
 
             Route::post("/", [PurchaseController::class, "store"])->name("purchase.store");
+            Route::post("/export", [PurchaseController::class, "exportList"])->name("purchase.export");
             Route::put("/{id}", [PurchaseController::class, "update"])->name("purchase.update");
             Route::delete("/{id}", [PurchaseController::class, "destroy"])->name("purchase.destroy");
             Route::patch("/{id}", [PurchaseController::class, "submit"])->name("purchase.submission");

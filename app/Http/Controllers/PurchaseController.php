@@ -63,6 +63,40 @@ class PurchaseController extends Controller
         );
     }
 
+    public function exportList()
+    {
+        try {
+            request()->validate([
+                "format" => "required",
+            ]);
+
+            $format = (int) request("format");
+
+            $purchase = Purchase::with([
+                "user:user_id,user_name",
+                "status:status_id,status_description",
+                "stock:stocks.*",
+            ])
+                ->whereNotIn("status_id", [4, 5])
+                ->orWhere("payment_status", "Belum Lunas")
+                ->get();
+
+            if ($purchase->count() == 0) {
+                return back()->with('purchase.error', 'Data pembelian tidak ditemukan.');
+            }
+
+            if ($format == 1) {
+                return Excel::download(new PurchaseExport($purchase), 'purchases_list.xlsx');
+            } else {
+                $pdf = \PDF::loadView('pages.exports.purchase', compact('purchase'))
+                    ->setPaper('a4', 'landscape');
+                return $pdf->download('Data-Pembelian-List.pdf');
+            }
+        } catch (\Throwable $th) {
+            return back()->with('purchase.error', $th->getMessage());
+        }
+    }
+
     public function export()
     {
         try {

@@ -29,6 +29,53 @@
                                     data-bs-target="#addModal">Add Data</button>
                             @endif
 
+                            <button type="button" class="btn btn-success me-2" data-bs-toggle="modal"
+                                data-bs-target="#exportModal">Export Data</button>
+
+                            {{-- Export modal --}}
+                            <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="addModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="addModalLabel">Export Data Pembelian</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <form class="forms-sample" method="POST"
+                                                    action="{{ route('purchase.export') }}" enctype="multipart/form-data">
+                                                    @csrf
+
+                                                    <div class="col-md-12 col-sm12">
+                                                        <div class="form-group mb-3">
+                                                            <label for="start_date">Format Export</label>
+                                                            <div class="row">
+                                                                <div class="col-md-6 col-sm-12">
+                                                                    <input type="radio" name="format" id="format"
+                                                                        value="1" checked> Excel
+                                                                </div>
+                                                                <div class="col-md-6 col-sm-12">
+                                                                    <input type="radio" name="format" id="format"
+                                                                        value="2"> Pdf
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="d-block mt-3">
+                                                        <button type="submit" class="btn btn-primary me-2">Submit</button>
+                                                        <button class="btn btn-light" type="button"
+                                                            data-bs-dismiss="modal">Cancel</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             {{-- Add modal --}}
                             <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel"
                                 aria-hidden="true">

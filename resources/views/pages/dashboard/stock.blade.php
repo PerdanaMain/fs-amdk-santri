@@ -15,6 +15,28 @@
                             @if (in_array(session()->get('user')->role_id, [1, 2]))
                                 <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal"
                                     data-bs-target="#addModal">Add Stock</button>
+                                
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="mdi mdi-export"></i> Export
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <form action="{{ route('stocks.export') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="format" value="1">
+                                                <button type="submit" class="dropdown-item">Excel</button>
+                                            </form>
+                                        </li>
+                                        <li>
+                                            <form action="{{ route('stocks.export') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="format" value="2">
+                                                <button type="submit" class="dropdown-item">PDF</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
                             @endif
 
                             {{-- Add modal --}}

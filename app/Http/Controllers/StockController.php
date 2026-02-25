@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Stock;
+use App\Exports\StockExport;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Http\Request;
 
 class StockController extends Controller
 {
@@ -13,6 +17,18 @@ class StockController extends Controller
             'pages.dashboard.stock',
             compact('stocks')
         );
+    }
+
+    public function export(Request $request)
+    {
+        if ($request->format == 1) {
+            return Excel::download(new StockExport, 'Data-Stock.xlsx');
+        }
+
+        $stocks = Stock::all();
+        $pdf = Pdf::loadView('pages.exports.stock', compact('stocks'))
+            ->setPaper('a4', 'landscape');
+        return $pdf->download('Data-Stock.pdf');
     }
 
     public function store()

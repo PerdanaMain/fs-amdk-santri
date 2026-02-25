@@ -23,6 +23,7 @@
                                     <tr>
                                         <th>Nama Customer</th>
                                         <th>Alamat Customer</th>
+                                        <th>Tanggal Transaksi</th>
                                         <th>Peta</th>
                                         <th>Status</th>
                                         <th>Actions</th>
@@ -33,6 +34,7 @@
                                         <tr>
                                             <td>{{ $ship->sale->customer->customer_name }}</td>
                                             <td>{{ $ship->sale->customer->customer_address }}</td>
+                                            <td>{{ $ship->created_at->setTimezone('Asia/Jakarta')->format('d-m-Y H:i:s') }}</td>
                                             <td>
                                                 <a href="https://www.google.com/maps/search/{{ $ship->sale->customer->customer_coordinate }}"
                                                     target="_blank">
