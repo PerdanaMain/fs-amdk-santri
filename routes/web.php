@@ -135,11 +135,14 @@ Route::group(["prefix" => "/"], function () {
         Route::prefix("debts")->group(function () {
             Route::get("/payable", [DebtController::class, "indexHutang"])->name("debts.payable");
             Route::get("/receivable", [DebtController::class, "indexPiutang"])->name("debts.receivable");
+            Route::post("/payable/export", [DebtController::class, "exportHutang"])->name("debts.payable.export");
+            Route::post("/receivable/export", [DebtController::class, "exportPiutang"])->name("debts.receivable.export");
         });
 
         Route::prefix("sales")->group(function () {
             Route::get("/", [SalesController::class, "index"])->name("sales");
             Route::post("/", [SalesController::class, "store"])->name("sales.store");
+            Route::post("/export", [SalesController::class, "exportList"])->name("sales.export");
             Route::put("/{id}", [SalesController::class, "update"])->name("sales.update");
             Route::delete("/{id}", [SalesController::class, "destroy"])->name("sales.destroy");
             Route::patch("/{id}", [SalesController::class, "submit"])->name("sales.submission");

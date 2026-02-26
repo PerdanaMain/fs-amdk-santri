@@ -23,10 +23,15 @@ class FinanceController extends Controller
             ->orderBy("finance_id", "desc")
             ->get();
 
+        $totalDebet = $finances->sum("finance_debet");
+        $totalCredit = $finances->sum("finance_credit");
+
         return view(
             "pages.dashboard.finance",
             compact(
-                "finances"
+                "finances",
+                "totalDebet",
+                "totalCredit"
             )
         );
     }

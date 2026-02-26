@@ -25,11 +25,60 @@
                         <h4 class="card-title">Data Penjualan</h4>
                         <div class="d-block my-4">
                             @if (!in_array(session()->get('user')->role_id, [4, 5, 6]))
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal"
                                     data-bs-target="#addModal">
                                     <i class="mdi mdi-plus"></i> Tambah Penjualan
                                 </button>
                             @endif
+
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                data-bs-target="#exportModal">
+                                <i class="mdi mdi-file-export"></i> Export Data
+                            </button>
+
+                            {{-- Export modal --}}
+                            <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exportModalLabel">Export Data Penjualan</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <form class="forms-sample" method="POST"
+                                                    action="{{ route('sales.export') }}" enctype="multipart/form-data">
+                                                    @csrf
+
+                                                    <div class="col-md-12 col-sm12">
+                                                        <div class="form-group mb-3">
+                                                            <label for="format">Format Export</label>
+                                                            <div class="row">
+                                                                <div class="col-md-6 col-sm-12">
+                                                                    <input type="radio" name="format" id="format_excel"
+                                                                        value="1" checked> Excel
+                                                                </div>
+                                                                <div class="col-md-6 col-sm-12">
+                                                                    <input type="radio" name="format" id="format_pdf"
+                                                                        value="2"> Pdf
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="d-block mt-3">
+                                                        <button type="submit" class="btn btn-primary me-2">Submit</button>
+                                                        <button class="btn btn-light" type="button"
+                                                            data-bs-dismiss="modal">Cancel</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             {{-- Add modal --}}
                             <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel"
@@ -91,16 +140,16 @@
                                                                 <label for="sale_price">Harga Barang / <span
                                                                         id="satuan_barang"></span> <span
                                                                         style="color:red">*</span></label>
-                                                                <input class="form-control" type="text" name="sale_price"
-                                                                    id="sale_price">
+                                                                <input class="form-control" type="text"
+                                                                    name="sale_price" id="sale_price">
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6 col-sm-12">
                                                             <div class="form-group">
                                                                 <label for="sale_total">Total Harga <span
                                                                         style="color:red">*</span></label>
-                                                                <input class="form-control" type="text" name="sale_total"
-                                                                    id="sale_total" hidden>
+                                                                <input class="form-control" type="text"
+                                                                    name="sale_total" id="sale_total" hidden>
                                                                 <input class="form-control" type="text"
                                                                     id="sale_total_show" readonly>
                                                             </div>
@@ -192,6 +241,7 @@
                                         <th>Jumlah Barang</th>
                                         <th>Harga Satuan</th>
                                         <th>Total Harga</th>
+                                        <th>Tgl Transaksi</th>
                                         <th>Status</th>
                                         <th>Status Pembayaran</th>
                                         <th>PIC</th>
@@ -206,6 +256,7 @@
                                             <td>{{ $sale->sale_quantity }}</td>
                                             <td>Rp {{ number_format($sale->sale_price, 0, ',', '.') }}</td>
                                             <td>Rp {{ number_format($sale->sale_total, 0, ',', '.') }}</td>
+                                            <td>{{ $sale->created_at->setTimezone('Asia/Jakarta')->format('d-m-Y H:i:s') }}
                                             <td><label
                                                     class="badge 
                                           {{ $sale->status->status_id == 1 || $sale->status->status_id == 3
@@ -634,12 +685,15 @@
 
                     var $result = $(
                         '<div style="padding: 4px;">' +
-                        '<div style="font-weight: bold; font-size: 1.1em;">' + data.text + '</div>' +
+                        '<div style="font-weight: bold; font-size: 1.1em;">' + data.text +
+                        '</div>' +
                         '<div style="font-size: 0.9em; color: #555; margin-top: 4px;">' +
-                        '<i class="mdi mdi-phone" style="margin-right: 5px;"></i>' + (phone ? phone : '-') +
+                        '<i class="mdi mdi-phone" style="margin-right: 5px;"></i>' + (phone ?
+                            phone : '-') +
                         '</div>' +
                         '<div style="font-size: 0.9em; color: #555;">' +
-                        '<i class="mdi mdi-map-marker" style="margin-right: 5px;"></i>' + (address ? address :
+                        '<i class="mdi mdi-map-marker" style="margin-right: 5px;"></i>' + (address ?
+                            address :
                             '-') +
                         '</div>' +
                         '</div>'
@@ -657,10 +711,13 @@
 
                     var term = params.term.toLowerCase();
                     var text = data.text.toLowerCase();
-                    var phone = $(data.element).data('phone') ? String($(data.element).data('phone')).toLowerCase() : '';
-                    var address = $(data.element).data('address') ? String($(data.element).data('address')).toLowerCase() : '';
+                    var phone = $(data.element).data('phone') ? String($(data.element).data('phone'))
+                        .toLowerCase() : '';
+                    var address = $(data.element).data('address') ? String($(data.element).data(
+                        'address')).toLowerCase() : '';
 
-                    if (text.indexOf(term) > -1 || phone.indexOf(term) > -1 || address.indexOf(term) > -1) {
+                    if (text.indexOf(term) > -1 || phone.indexOf(term) > -1 || address.indexOf(term) > -
+                        1) {
                         return data;
                     }
 
@@ -750,6 +807,14 @@
                                     'error'
                                 )
                             }
+                        },
+                        error: function(response) {
+                            console.log(response);
+                            Swal.fire(
+                                'Failed!',
+                                response.responseJSON.message,
+                                'error'
+                            )
                         }
                     });
                 }
@@ -791,6 +856,14 @@
                                     'error'
                                 )
                             }
+                        },
+                        error: function(response) {
+                            console.log(response);
+                            Swal.fire(
+                                'Failed!',
+                                response.responseJSON.message,
+                                'error'
+                            )
                         }
                     });
                 }
@@ -817,8 +890,7 @@
                             _token: $("input[name=_token]").val()
                         },
                         success: function(response) {
-                            console.log(response);
-                            if (response.status == true) {
+                            if (response.status) {
                                 Swal.fire(
                                     'Approved!',
                                     response.message,
@@ -834,7 +906,6 @@
                             }
                         },
                         error: function(response) {
-                            console.log(response);
                             Swal.fire(
                                 'Failed!',
                                 response.responseJSON.message,
@@ -883,6 +954,14 @@
                                     'error'
                                 )
                             }
+                        },
+                        error: function(response) {
+                            console.log(response);
+                            Swal.fire(
+                                'Failed!',
+                                response.responseJSON.message,
+                                'error'
+                            )
                         }
                     });
                 }
@@ -932,6 +1011,14 @@
                                     'error'
                                 )
                             }
+                        },
+                        error: function(response) {
+                            console.log(response);
+                            Swal.fire(
+                                'Failed!',
+                                response.responseJSON.message,
+                                'error'
+                            )
                         }
                     });
                 }

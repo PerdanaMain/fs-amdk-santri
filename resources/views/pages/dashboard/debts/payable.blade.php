@@ -25,8 +25,58 @@
             <div class="col-lg-12 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
-                        <h4 class="card-title">Data Hutang (Pembelian Belum Lunas)</h4>
-                        
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="card-title">Data Hutang (Pembelian Belum Lunas)</h4>
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                data-bs-target="#exportModal">
+                                <i class="mdi mdi-file-export"></i> Export Data
+                            </button>
+                        </div>
+
+                        {{-- Export modal --}}
+                        <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exportModalLabel">Export Data Hutang</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <form class="forms-sample" method="POST"
+                                                action="{{ route('debts.payable.export') }}">
+                                                @csrf
+
+                                                <div class="col-md-12 col-sm12">
+                                                    <div class="form-group mb-3">
+                                                        <label for="format">Format Export</label>
+                                                        <div class="row">
+                                                            <div class="col-md-6 col-sm-12">
+                                                                <input type="radio" name="format" id="format_excel"
+                                                                    value="1" checked> Excel
+                                                            </div>
+                                                            <div class="col-md-6 col-sm-12">
+                                                                <input type="radio" name="format" id="format_pdf"
+                                                                    value="2"> Pdf
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="d-block mt-3">
+                                                    <button type="submit" class="btn btn-primary me-2">Submit</button>
+                                                    <button class="btn btn-light" type="button"
+                                                        data-bs-dismiss="modal">Cancel</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="table-responsive">
                             <table class="table table-striped" id="table-payable">
                                 <thead>
@@ -37,6 +87,7 @@
                                         <th>Total Hutang</th>
                                         <th>Jatuh Tempo</th>
                                         <th>Status Pembayaran</th>
+                                        <th>Tgl Transaksi</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -48,6 +99,7 @@
                                             <td>Rp {{ number_format($p->purchase_price, 0, ',', '.') }}</td>
                                             <td>Rp {{ number_format($p->purchase_total, 0, ',', '.') }}</td>
                                             <td>-</td> {{-- Purchase table doesn't have due date yet, unlike Sales --}}
+                                            <td>{{ $p->created_at->setTimezone('Asia/Jakarta')->format('d-m-Y H:i:s') }}</td>
                                             <td>
                                                 <label
                                                     class="badge {{ $p->payment_status == 'Lunas' ? 'badge-success' : 'badge-danger' }}">
@@ -118,4 +170,13 @@
             })
         })
     </script>
+    @if (session('purchase.error'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: '{{ session('purchase.error') }}',
+            })
+        </script>
+    @endif
 @endpush
