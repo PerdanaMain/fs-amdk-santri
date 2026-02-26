@@ -69,20 +69,27 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($sales as $sales)
+            @foreach ($sales as $sale)
                 <tr>
-                    <td>{{ $sales->sale_id }}</td>
-                    <td>{{ $sales->customer->customer_name }}</td>
-                    <td>{{ $sales->customer->customer_address }}</td>
-                    <td>{{ $sales->payment->payment_name }}</td>
-                    <td>{{ $sales->stock->stock_name }}</td>
-                    <td>{{ $sales->sale_quantity . ' ' . $sales->stock->stock_satuan }}</td>
-                    <td>{{ number_format($sales->sale_price, 0, ',', '.') }}</td>
-                    <td>{{ number_format($sales->sale_total, 0, ',', '.') }}</td>
-                    <td>{{ $sales->user->user_name }}</td>
-                    <td>{{ $sales->sale_date }}</td>
+                    <td>{{ $sale->sale_id }}</td>
+                    <td>{{ $sale->customer->customer_name }}</td>
+                    <td>{{ $sale->customer->customer_address }}</td>
+                    <td>{{ $sale->payment->payment_name }}</td>
+                    <td>{{ $sale->stock->stock_name }}</td>
+                    <td>{{ $sale->sale_quantity . ' ' . $sale->stock->stock_satuan }}</td>
+                    <td>{{ number_format($sale->sale_price, 0, ',', '.') }}</td>
+                    <td>{{ number_format($sale->sale_total, 0, ',', '.') }}</td>
+                    <td>{{ $sale->user->user_name }}</td>
+                    <td>{{ $sale->sale_date }}</td>
                 </tr>
             @endforeach
+            <tr>
+                <td colspan="5" style="text-align: right; font-weight: bold;">Total</td>
+                <td style="font-weight: bold;">{{ $sales->sum('sale_quantity') }}</td>
+                <td></td>
+                <td style="font-weight: bold;">Rp {{ number_format($sales->sum('sale_total'), 0, ',', '.') }}</td>
+                <td colspan="2"></td>
+            </tr>
         </tbody>
     </table>
 </body>

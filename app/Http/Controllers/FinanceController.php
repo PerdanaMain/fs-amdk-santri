@@ -19,6 +19,7 @@ class FinanceController extends Controller
         $finances = Finance::with([
             "purchase:purchases.*",
             "sale:sales.*",
+            "sale.customer:customers.*",
         ])
             ->orderBy("finance_id", "desc")
             ->get();

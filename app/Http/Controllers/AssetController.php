@@ -14,7 +14,9 @@ class AssetController extends Controller
     public function index()
     {
         $assets = Asset::orderBy('created_at', 'desc')->get();
-        return view('pages.dashboard.asset', compact('assets'));
+        $totalAssetValue = $assets->sum('current_value');
+        
+        return view('pages.dashboard.asset', compact('assets', 'totalAssetValue'));
     }
 
     public function export(Request $request)

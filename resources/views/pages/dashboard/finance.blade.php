@@ -165,10 +165,11 @@
                                     <tr>
                                         <th>Kode</th>
                                         <th>Transaksi</th>
+                                        <th>Customer</th>
                                         <th>Debet</th>
                                         <th>Kredit</th>
                                         <th>Dreskripsi</th>
-                                        <th>Tanggal</th>
+                                        <th>Tgl Transaksi</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -177,10 +178,11 @@
                                         <tr>
                                             <td>{{ $finance->finance_code }}</td>
                                             <td>{{ $finance->finance_name }}</td>
+                                            <td>{{ $finance->sale->customer->customer_name ?? '-' }}</td>
                                             <td>Rp {{ number_format($finance->finance_debet, 0, ',', '.') }}</td>
                                             <td>Rp {{ number_format($finance->finance_credit, 0, ',', '.') }}</td>
                                             <td>{{ $finance->finance_description }}</td>
-                                            <td>{{ date_format(date_create($finance->created_at), 'd-m-Y') }}</td>
+                                            <td>{{ $finance->created_at->setTimezone('Asia/Jakarta')->format('d-m-Y H:i:s') }}</td>
                                             <td>
                                                 <a class="nav-link" id="StockDropdown" href="#"
                                                     data-bs-toggle="dropdown" aria-expanded="false">

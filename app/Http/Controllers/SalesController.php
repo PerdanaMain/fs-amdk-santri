@@ -115,9 +115,9 @@ class SalesController extends Controller
                 "stock:stocks.*",
                 "payment:payments.*",
             )
-                ->where("status_id", 2);
-            if ($start == null && $end == null) {
+                ->whereNotIn("status_id", [1, 3, 6]);
 
+            if ($start == null && $end == null) {
                 $sales = $sales->orderBy("sale_id", "desc")
                     ->get();
             } else {
