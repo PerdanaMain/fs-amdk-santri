@@ -273,7 +273,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "/media/" + media_id,
+                        url: "/dashboard/media/" + media_id,
                         type: 'DELETE',
                         data: {
                             _token: $("input[name=_token]").val()

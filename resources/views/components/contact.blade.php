@@ -57,7 +57,7 @@
                         </div>
                     </div>
                     <div class="contact-dec">
-                        <img src="assets/images/contact-decoration.png" alt="">
+                        <img src="{{ asset('assets/images/contact-decoration.png') }}" alt="">
                     </div>
                 </form>
             </div>

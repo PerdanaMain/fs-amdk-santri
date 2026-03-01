@@ -8,5 +8,6 @@
     @include('components.banner')
     @include('components.pengolahan')
     @include('components.detail')
+    @include('components.media')
     @include('components.contact')
 @endsection

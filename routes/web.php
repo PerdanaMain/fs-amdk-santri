@@ -9,6 +9,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicMediaController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\ShipmentController;
@@ -33,7 +34,8 @@ Route::group(["prefix" => "/"], function () {
      */
     Route::middleware(["guest"])->group(function () {
         Route::get("", function () {
-            return view('pages.welcome');
+            $medias = \App\Models\Media::orderBy('created_at', 'desc')->take(3)->get();
+            return view('pages.welcome', compact('medias'));
         })->name('home');
 
         Route::get('/product', function () {
@@ -47,6 +49,9 @@ Route::group(["prefix" => "/"], function () {
         Route::get('/about', function () {
             return view('pages.about');
         })->name('about');
+
+        Route::get('/media', [PublicMediaController::class, 'index'])->name('media.public');
+        Route::get('/media/{id}', [PublicMediaController::class, 'show'])->name('media.detail');
 
         Route::post("/feedbacks", [LoginController::class, "feedback"])->name("feedbacks");
         Route::put("/reset-submission/{email}", [UserController::class, "resetSubmission"])->name("user.resetSubmission");
@@ -197,7 +202,7 @@ Route::group(["prefix" => "/"], function () {
             Route::put("/{id}", [ProfileController::class, "update"])->name('profile.update');
         });
 
-        Route::prefix("media")->group(function () {
+        Route::prefix("dashboard/media")->group(function () {
             Route::get("/", [MediaController::class, "index"])->name("media.index");
             Route::post("/", [MediaController::class, "store"])->name("media.store");
             Route::put("/{id}", [MediaController::class, "update"])->name("media.update");
