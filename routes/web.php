@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DebtController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FinanceController;
+use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SalesController;
@@ -194,6 +195,13 @@ Route::group(["prefix" => "/"], function () {
         Route::prefix('profile')->group(function () {
             Route::get("/", [ProfileController::class, "index"])->name('profile');
             Route::put("/{id}", [ProfileController::class, "update"])->name('profile.update');
+        });
+
+        Route::prefix("media")->group(function () {
+            Route::get("/", [MediaController::class, "index"])->name("media.index");
+            Route::post("/", [MediaController::class, "store"])->name("media.store");
+            Route::put("/{id}", [MediaController::class, "update"])->name("media.update");
+            Route::delete("/{id}", [MediaController::class, "destroy"])->name("media.destroy");
         });
 
         Route::prefix("user")->group(function () {

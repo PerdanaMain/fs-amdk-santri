@@ -49,6 +49,15 @@
         @endif
 
         @if (in_array(session()->get('user')->role_id, [1, 2, 5, 6]))
+            <li class="nav-item {{ Route::currentRouteName() == 'media.index' ? 'active' : '' }}">
+                <a class="nav-link" href="/media">
+                    <i class="mdi mdi-folder-image menu-icon"></i>
+                    <span class="menu-title">Media</span>
+                </a>
+            </li>
+        @endif
+
+        @if (in_array(session()->get('user')->role_id, [1, 2, 5, 6]))
             <li class="nav-item nav-category">Transactions</li>
             <li class="nav-item" {{ Route::currentRouteName() == 'purchase' ? 'active' : '' }}>
                 <a class="nav-link" href="/purchase">
