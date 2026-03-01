@@ -12,6 +12,7 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\StockController;
+use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VisitController;
 use Illuminate\Support\Facades\Route;
@@ -94,6 +95,13 @@ Route::group(["prefix" => "/"], function () {
             Route::put("/{id}", [CustomerController::class, "update"])->name('customer.update');
             Route::delete("/{id}", [CustomerController::class, "destroy"])->name('customer.destroy');
             Route::get("/template", [CustomerController::class, "template"])->name("customer.template");
+        });
+
+        Route::prefix("suppliers")->group(function () {
+            Route::get("/", [SupplierController::class, "index"])->name('supplier');
+            Route::post("/", [SupplierController::class, "store"])->name('supplier.store');
+            Route::put("/{id}", [SupplierController::class, "update"])->name('supplier.update');
+            Route::delete("/{id}", [SupplierController::class, "destroy"])->name('supplier.destroy');
         });
 
         Route::prefix("visits")->group(function () {

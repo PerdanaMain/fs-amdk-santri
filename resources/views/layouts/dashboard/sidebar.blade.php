@@ -23,6 +23,14 @@
                 </a>
             </li>
         @endif
+        @if (in_array(session()->get('user')->role_id, [1, 2, 3, 5, 6]))
+            <li class="nav-item {{ Route::currentRouteName() == 'supplier' ? 'active' : '' }}">
+                <a class="nav-link" href="/suppliers">
+                    <i class="mdi mdi-truck menu-icon"></i>
+                    <span class="menu-title">Suppliers</span>
+                </a>
+            </li>
+        @endif
         @if (session()->get('user')->role_id == 2)
             <li class="nav-item {{ Route::currentRouteName() == 'employee' ? 'active' : '' }}">
                 <a class="nav-link" href="/employees">

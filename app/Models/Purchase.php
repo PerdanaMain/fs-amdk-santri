@@ -49,4 +49,8 @@ class Purchase extends Model
     {
         return $this->belongsTo(Payment::class, 'payment_id', 'payment_id');
     }
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class, 'supplier_id', 'supplier_id');
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Stock;
+use App\Models\Supplier;
 use App\Exports\StockExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
@@ -12,10 +13,11 @@ class StockController extends Controller
 {
     public function index()
     {
-        $stocks = Stock::all();
+        $stocks = Stock::with('supplier')->get();
+        $suppliers = Supplier::all();
         return view(
             'pages.dashboard.stock',
-            compact('stocks')
+            compact('stocks', 'suppliers')
         );
     }
 
@@ -35,6 +37,7 @@ class StockController extends Controller
     {
         // validate the request
         request()->validate([
+            'supplier_id' => 'required',
             'stock_name' => 'required',
             'stock_quantity' => 'required|numeric',
             "stock_satuan" => "required",
@@ -48,6 +51,7 @@ class StockController extends Controller
         $file->move('storage/stocks', $file_name);
 
         Stock::create([
+            'supplier_id' => request('supplier_id'),
             'stock_name' => request('stock_name'),
             'stock_quantity' => request('stock_quantity'),
             'stock_satuan' => request('stock_satuan'),
@@ -61,6 +65,7 @@ class StockController extends Controller
     {
         // validate the request
         request()->validate([
+            'supplier_id' => 'required',
             'stock_name' => 'required',
             'stock_quantity' => 'required|numeric',
             "stock_satuan" => "required",
@@ -73,7 +78,9 @@ class StockController extends Controller
         if (request()->hasFile('stock_photo')) {
             // unlink old file
             $old = Stock::where("stock_id", $id)->first();
-            unlink(public_path('storage/stocks/' . $old->stock_photo));
+            if ($old->stock_photo && file_exists(public_path('storage/stocks/' . $old->stock_photo))) {
+                unlink(public_path('storage/stocks/' . $old->stock_photo));
+            }
 
             $file = request()->file('stock_photo');
             $file_name = md5($file->getClientOriginalName() . time()) . '.' . $file->getClientOriginalExtension();
@@ -81,6 +88,7 @@ class StockController extends Controller
 
             // update the stock
             $stock->update([
+                'supplier_id' => request('supplier_id'),
                 'stock_name' => request('stock_name'),
                 'stock_quantity' => request('stock_quantity'),
                 'stock_satuan' => request('stock_satuan'),
@@ -89,6 +97,7 @@ class StockController extends Controller
             ]);
         } else {
             $stock->update([
+                'supplier_id' => request('supplier_id'),
                 'stock_name' => request('stock_name'),
                 'stock_quantity' => request('stock_quantity'),
                 'stock_satuan' => request('stock_satuan'),

@@ -165,7 +165,7 @@
                                     <tr>
                                         <th>Kode</th>
                                         <th>Transaksi</th>
-                                        <th>Customer</th>
+                                        <th>Relasi</th>
                                         <th>Debet</th>
                                         <th>Kredit</th>
                                         <th>Dreskripsi</th>
@@ -178,7 +178,17 @@
                                         <tr>
                                             <td>{{ $finance->finance_code }}</td>
                                             <td>{{ $finance->finance_name }}</td>
-                                            <td>{{ $finance->sale->customer->customer_name ?? '-' }}</td>
+                                            <td>
+                                                @if($finance->supplier)
+                                                    {{ $finance->supplier->supplier_name }}
+                                                @elseif($finance->purchase && $finance->purchase->stock && $finance->purchase->stock->supplier)
+                                                    {{ $finance->purchase->stock->supplier->supplier_name }}
+                                                @elseif($finance->sale && $finance->sale->customer)
+                                                    {{ $finance->sale->customer->customer_name }}
+                                                @else
+                                                    -
+                                                @endif
+                                            </td>
                                             <td>Rp {{ number_format($finance->finance_debet, 0, ',', '.') }}</td>
                                             <td>Rp {{ number_format($finance->finance_credit, 0, ',', '.') }}</td>
                                             <td>{{ $finance->finance_description }}</td>
