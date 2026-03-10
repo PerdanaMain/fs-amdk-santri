@@ -18,7 +18,8 @@ class MediaController extends Controller
             return redirect()->route('dashboard');
         }
 
-        $medias = Media::orderBy('media_id', 'desc')->get();
+        $medias = Media::orderBy('created_at', 'desc')->get();
+
         return view('pages.dashboard.media', compact('medias'));
     }
 
