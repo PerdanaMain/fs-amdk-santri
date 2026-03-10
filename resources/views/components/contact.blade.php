@@ -7,8 +7,7 @@
                     </h2>
 
                     <div class="phone-info">
-                        <h4>Hubungi kami: <span><i class="fa fa-phone"></i> <a href="#">+62 875 3714
-                                    5922</a></span></h4>
+                        <h4>Hubungi kami: <span><i class="fa fa-phone"></i> <a href="#">+62 82245429508</a></span></h4>
                     </div>
 
                     <iframe

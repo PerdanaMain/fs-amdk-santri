@@ -25,7 +25,7 @@
         <div class="row align-items-center mt-5 pt-5">
              <div class="col-lg-6 order-lg-2 wow fadeInRight" data-wow-duration="1s" data-wow-delay="0.2s">
                 <div class="position-relative text-center">
-                     <img src="{{ asset('assets/images/semua-produk-air-mineral-santro.png') }}" alt="Produk Santri" class="img-fluid" style="max-height: 400px;">
+                     <img src="{{ asset('assets/images/semua-produk-air-mineral-santro.png') }}" alt="Produk Santri" class="img-fluid" style="max-height: 650px;">
                 </div>
             </div>
             <div class="col-lg-6 order-lg-1 wow fadeInLeft" data-wow-duration="1s" data-wow-delay="0.4s">

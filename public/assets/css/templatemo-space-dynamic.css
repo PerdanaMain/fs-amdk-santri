@@ -907,6 +907,7 @@ Banner Style
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
+    background-image: url('/assets/images/bg-mountain.jpg');
     background-color: #e5eef3;
     padding: 226px 0px 120px 0px;
     position: relative;
