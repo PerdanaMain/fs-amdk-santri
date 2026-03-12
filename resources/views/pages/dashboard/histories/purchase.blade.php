@@ -92,6 +92,7 @@
                                 <thead>
                                     <tr>
                                         <th>Nama Barang</th>
+                                        <th>Supplier</th>
                                         <th>Jumlah Pembelian</th>
                                         <th>Harga Satuan</th>
                                         <th>Total Harga</th>
@@ -104,6 +105,7 @@
                                     @foreach ($purchases as $p)
                                         <tr>
                                             <td>{{ $p->stock->stock_name }}</td>
+                                            <td>{{ $p->supplier ? $p->supplier->supplier_name : '-' }}</td>
                                             <td>{{ $p->purchase_quantity }} {{ $p->stock->stock_satuan }}</td>
                                             <td>Rp {{ number_format($p->purchase_price, 0, ',', '.') }}</td>
                                             <td>Rp {{ number_format($p->purchase_total, 0, ',', '.') }}</td>
@@ -186,6 +188,8 @@
                                                             <div class="col-md-6 col-sm-12">
                                                                 <p><b>Nama Barang:</b>
                                                                     {{ $p->stock->stock_name }}</p>
+                                                                <p><b>Supplier:</b>
+                                                                    {{ $p->supplier ? $p->supplier->supplier_name : '-' }}</p>
                                                                 <p><b>Jumlah Pembelian:</b> {{ $p->purchase_quantity }}
                                                                     {{ $p->stock->stock_satuan }}</p>
                                                                 <p><b>Harga Satuan:</b> Rp

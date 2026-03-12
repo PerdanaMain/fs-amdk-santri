@@ -92,6 +92,17 @@
                                                     action="{{ route('purchase.store') }}">
                                                     @csrf
                                                     <div class="form-group">
+                                                        <label for="supplier_id">Supplier <span style="color: red">
+                                                                *</span></label>
+                                                        <select class="form-select" name="supplier_id" id="supplier_select">
+                                                            <option selected hidden>=== Pilih Supplier ===</option>
+                                                            @foreach ($suppliers as $supplier)
+                                                                <option value="{{ $supplier->supplier_id }}">
+                                                                    {{ $supplier->supplier_name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group">
                                                         <label for="stock_id">Nama Barang <span style="color: red">
                                                                 *</span></label>
                                                         <select id="stock_select" class="form-select" name="stock_id">
@@ -105,22 +116,21 @@
                                                         </select>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label for="purchase_description">Deskripsi Pembelian <span
-                                                                style="color: red">
-                                                                *</span></label>
+                                                        <label for="purchase_description">Deskripsi Pembelian </label>
                                                         <textarea name="purchase_description" class="form-control" cols="30" rows="10"></textarea>
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="stock_id">Jumlah Barang <span style="color: red">
                                                                 *</span></label>
-                                                        <input class="form-control" type="text" name="purchase_quantity"
+                                                        <input class="form-control" type="number" name="purchase_quantity"
                                                             id="purchase_quantity">
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-md-6 col-sm-12">
                                                             <div class="form-group">
                                                                 <label for="stock_id">Harga Satuan / <span
-                                                                        id="satuan_barang"></span> <span style="color: red">
+                                                                        id="satuan_barang"></span> <span
+                                                                        style="color: red">
                                                                         *</span></label>
                                                                 <input class="form-control" type="text"
                                                                     name="purchase_price" id="purchase_price">
@@ -146,10 +156,11 @@
                                                         <div class="form-group">
                                                             <label for="stock_id">Total Harga <span style="color: red">
                                                                     *</span></label>
-                                                            <input class="form-control" type="text" name="purchase_total"
-                                                                id="purchase_total_show" disabled readonly>
-                                                            <input class="form-control" type="text" name="purchase_total"
-                                                                id="purchase_total" hidden>
+                                                            <input class="form-control" type="text"
+                                                                name="purchase_total" id="purchase_total_show" disabled
+                                                                readonly>
+                                                            <input class="form-control" type="text"
+                                                                name="purchase_total" id="purchase_total" hidden>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
@@ -167,7 +178,8 @@
                                                         </div>
                                                     </div>
                                                     <div class="d-block">
-                                                        <button type="submit" class="btn btn-primary me-2">Submit</button>
+                                                        <button type="submit"
+                                                            class="btn btn-primary me-2">Submit</button>
                                                         <button class="btn btn-light" type="button"
                                                             data-bs-dismiss="modal">Cancel</button>
                                                     </div>
@@ -184,6 +196,7 @@
                                 <thead>
                                     <tr>
                                         <th>Nama Barang</th>
+                                        <th>Supplier</th>
                                         <th>Jumlah Pembelian</th>
                                         <th>Harga Satuan</th>
                                         <th>Total Harga</th>
@@ -197,6 +210,7 @@
                                     @foreach ($purchases as $p)
                                         <tr>
                                             <td>{{ $p->stock->stock_name }}</td>
+                                            <td>{{ $p->supplier ? $p->supplier->supplier_name : '-' }}</td>
                                             <td>{{ $p->purchase_quantity }} {{ $p->stock->stock_satuan }}</td>
                                             <td>Rp {{ number_format($p->purchase_price, 0, ',', '.') }}</td>
                                             <td>Rp {{ number_format($p->purchase_total, 0, ',', '.') }}</td>
@@ -323,6 +337,9 @@
                                                             <div class="col-md-6 col-sm-12">
                                                                 <p><b>Nama Barang:</b>
                                                                     {{ $p->stock->stock_name }}</p>
+                                                                <p><b>Supplier:</b>
+                                                                    {{ $p->supplier ? $p->supplier->supplier_name : '-' }}
+                                                                </p>
                                                                 <p><b>Jumlah Pembelian:</b> {{ $p->purchase_quantity }}
                                                                     {{ $p->stock->stock_satuan }}</p>
                                                                 <p><b>Harga Satuan:</b> Rp
@@ -399,6 +416,22 @@
                                                                 action="{{ route('purchase.update', ['id' => $p->purchase_id]) }}">
                                                                 @csrf
                                                                 @method('PUT')
+                                                                <div class="form-group">
+                                                                    <label for="supplier_id">Supplier <span
+                                                                            style="color: red"> *</span></label>
+                                                                    <select class="form-select supplier-select-update"
+                                                                        name="supplier_id">
+                                                                        <option selected hidden
+                                                                            value="{{ $p->supplier_id }}">
+                                                                            {{ $p->supplier ? $p->supplier->supplier_name : '=== Pilih Supplier ===' }}
+                                                                        </option>
+                                                                        @foreach ($suppliers as $supplier)
+                                                                            <option value="{{ $supplier->supplier_id }}">
+                                                                                {{ $supplier->supplier_name }}
+                                                                            </option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
                                                                 <div class="form-group">
                                                                     <label for="stock_id">Nama Barang <span
                                                                             style="color: red"> *</span></label>
@@ -536,6 +569,20 @@
                     );
                     return $result;
                 }
+            });
+
+            $('#addModal #supplier_select').select2({
+                dropdownParent: $('#addModal'),
+                placeholder: '=== Pilih Supplier ===',
+                width: '100%'
+            });
+
+            $('.supplier-select-update').each(function() {
+                $(this).select2({
+                    dropdownParent: $(this).closest('.modal'),
+                    placeholder: '=== Pilih Supplier ===',
+                    width: '100%'
+                });
             });
         });
 

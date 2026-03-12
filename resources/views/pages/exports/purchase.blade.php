@@ -57,6 +57,7 @@
             <tr>
                 <th>ID</th>
                 <th>Nama Barang</th>
+                <th>Supplier</th>
                 <th>Jumlah Barang</th>
                 <th>Harga Barang</th>
                 <th>Total Harga</th>
@@ -70,6 +71,7 @@
                 <tr>
                     <td>{{ $p->purchase_id }}</td>
                     <td>{{ $p->stock->stock_name }}</td>
+                    <td>{{ $p->supplier ? $p->supplier->supplier_name : '-' }}</td>
                     <td>{{ $p->purchase_quantity }}</td>
                     <td>{{ number_format($p->purchase_price, 0, ',', '.') }}</td>
                     <td>{{ number_format($p->purchase_total, 0, ',', '.') }}</td>

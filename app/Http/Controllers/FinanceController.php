@@ -17,7 +17,7 @@ class FinanceController extends Controller
         }
 
         $query = Finance::with([
-            "purchase.stock.supplier",
+            "purchase.supplier",
             "sale.customer",
             "supplier"
         ])->orderBy("finance_id", "desc");

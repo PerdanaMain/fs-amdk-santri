@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Stock;
-use App\Models\Supplier;
 use App\Exports\StockExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
@@ -13,11 +12,10 @@ class StockController extends Controller
 {
     public function index()
     {
-        $stocks = Stock::with('supplier')->get();
-        $suppliers = Supplier::all();
+        $stocks = Stock::all();
         return view(
             'pages.dashboard.stock',
-            compact('stocks', 'suppliers')
+            compact('stocks')
         );
     }
 
@@ -37,7 +35,6 @@ class StockController extends Controller
     {
         // validate the request
         request()->validate([
-            'supplier_id' => 'required',
             'stock_name' => 'required',
             'stock_quantity' => 'required|numeric',
             "stock_satuan" => "required",
@@ -51,7 +48,6 @@ class StockController extends Controller
         $file->move('storage/stocks', $file_name);
 
         Stock::create([
-            'supplier_id' => request('supplier_id'),
             'stock_name' => request('stock_name'),
             'stock_quantity' => request('stock_quantity'),
             'stock_satuan' => request('stock_satuan'),
@@ -65,7 +61,6 @@ class StockController extends Controller
     {
         // validate the request
         request()->validate([
-            'supplier_id' => 'required',
             'stock_name' => 'required',
             'stock_quantity' => 'required|numeric',
             "stock_satuan" => "required",
@@ -88,7 +83,6 @@ class StockController extends Controller
 
             // update the stock
             $stock->update([
-                'supplier_id' => request('supplier_id'),
                 'stock_name' => request('stock_name'),
                 'stock_quantity' => request('stock_quantity'),
                 'stock_satuan' => request('stock_satuan'),
@@ -97,7 +91,6 @@ class StockController extends Controller
             ]);
         } else {
             $stock->update([
-                'supplier_id' => request('supplier_id'),
                 'stock_name' => request('stock_name'),
                 'stock_quantity' => request('stock_quantity'),
                 'stock_satuan' => request('stock_satuan'),

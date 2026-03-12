@@ -179,10 +179,8 @@
                                             <td>{{ $finance->finance_code }}</td>
                                             <td>{{ $finance->finance_name }}</td>
                                             <td>
-                                                @if($finance->supplier)
-                                                    {{ $finance->supplier->supplier_name }}
-                                                @elseif($finance->purchase && $finance->purchase->stock && $finance->purchase->stock->supplier)
-                                                    {{ $finance->purchase->stock->supplier->supplier_name }}
+                                                @if($finance->purchase && $finance->purchase->stock)
+                                                    {{ $finance->purchase->stock->stock_name }} - {{ $finance->purchase->supplier ? $finance->purchase->supplier->supplier_name : '-' }}
                                                 @elseif($finance->sale && $finance->sale->customer)
                                                     {{ $finance->sale->customer->customer_name }}
                                                 @else

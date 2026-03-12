@@ -24,6 +24,7 @@ class PurchaseExport implements FromCollection, WithHeadings, WithStyles, Should
             return [
                 "No" => $p->purchase_id,
                 "Nama Barang" => $p->stock->stock_name,
+                "Supplier" => $p->supplier ? $p->supplier->supplier_name : '-',
                 "Jumlah Barang" => $p->purchase_quantity,
                 "Harga Pembelian" => "Rp. " . number_format($p->purchase_price, 0, ",", ".") . ",-",
                 "Total Harga" => "Rp. " . number_format($p->purchase_total, 0, ",", ".") . ",-",
@@ -40,6 +41,7 @@ class PurchaseExport implements FromCollection, WithHeadings, WithStyles, Should
         $data->push([
             "No" => "Total",
             "Nama Barang" => "",
+            "Supplier" => "",
             "Jumlah Barang" => $totalQty,
             "Harga Pembelian" => "",
             "Total Harga" => "Rp. " . number_format($totalPrice, 0, ",", ".") . ",-",
@@ -57,6 +59,7 @@ class PurchaseExport implements FromCollection, WithHeadings, WithStyles, Should
         return [
             "No",
             "Nama Barang",
+            "Supplier",
             "Jumlah Barang",
             "Harga Barang",
             "Total Harga",

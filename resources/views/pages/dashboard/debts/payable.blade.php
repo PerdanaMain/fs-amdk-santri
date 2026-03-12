@@ -86,8 +86,8 @@
                                         <th>Harga Satuan</th>
                                         <th>Total Hutang</th>
                                         <th>Jatuh Tempo</th>
-                                        <th>Status Pembayaran</th>
                                         <th>Tgl Transaksi</th>
+                                        <th>Status Pembayaran</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>

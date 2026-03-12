@@ -59,15 +59,6 @@
                                                         <input type="file" class="form-control" name="stock_photo">
                                                     </div>
                                                     <div class="form-group">
-                                                        <label for="supplier_id">Supplier</label>
-                                                        <select class="form-select" name="supplier_id" id="supplier_id">
-                                                            <option selected disabled>Pilih Supplier</option>
-                                                            @foreach ($suppliers as $supplier)
-                                                                <option value="{{ $supplier->supplier_id }}">{{ $supplier->supplier_name }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                    <div class="form-group">
                                                         <label for="stock_name">Name</label>
                                                         <input type="text" class="form-control" placeholder="Name"
                                                             name="stock_name">
@@ -109,9 +100,6 @@
                                             Photo
                                         </th>
                                         <th>
-                                            Supplier
-                                        </th>
-                                        <th>
                                             Name
                                         </th>
                                         <th>
@@ -131,11 +119,6 @@
                                             <td class="py-1">
                                                 <img src="{{ url('storage/stocks/' . $stock->stock_photo) }}" alt="image"
                                                     style="width: 90px; height:90px;" />
-                                            </td>
-                                            <td>
-                                                <p class="mb-1">{{ $stock->supplier ? $stock->supplier->supplier_name : '-' }}</p>
-                                                <small class="text-muted d-block">{{ $stock->supplier ? $stock->supplier->supplier_owner : '' }}</small>
-                                                <small class="text-muted">{{ $stock->supplier ? $stock->supplier->supplier_phone : '' }}</small>
                                             </td>
                                             <td>
                                                 {{ $stock->stock_name }}
@@ -191,10 +174,6 @@
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <h4>{{ $stock->stock_name }}</h4>
-                                                                <p class="mb-1"><strong>Supplier:</strong> {{ $stock->supplier ? $stock->supplier->supplier_name : '-' }}</p>
-                                                                <p class="mb-1"><strong>Owner:</strong> {{ $stock->supplier ? $stock->supplier->supplier_owner : '-' }}</p>
-                                                                <p class="mb-1"><strong>Phone:</strong> {{ $stock->supplier ? $stock->supplier->supplier_phone : '-' }}</p>
-                                                                <p class="mb-3"><strong>Address:</strong> {{ $stock->supplier ? $stock->supplier->supplier_address : '-' }}</p>
                                                                 <p class="mb-1"><strong>Description:</strong> {{ $stock->stock_description }}</p>
                                                                 <p>Stock: {{ $stock->stock_quantity }}
                                                                     {{ $stock->stock_satuan }}</p>
@@ -230,15 +209,6 @@
                                                                     <label for="stock_photo">Photo</label>
                                                                     <input type="file" class="form-control"
                                                                         name="stock_photo">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="supplier_id">Supplier</label>
-                                                                    <select class="form-select" name="supplier_id" id="supplier_id">
-                                                                        <option selected disabled>Pilih Supplier</option>
-                                                                        @foreach ($suppliers as $supplier)
-                                                                            <option value="{{ $supplier->supplier_id }}" {{ $stock->supplier_id == $supplier->supplier_id ? 'selected' : '' }}>{{ $supplier->supplier_name }}</option>
-                                                                        @endforeach
-                                                                    </select>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="stock_name">Name</label>
