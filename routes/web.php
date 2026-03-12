@@ -106,6 +106,8 @@ Route::group(["prefix" => "/"], function () {
         Route::prefix("suppliers")->group(function () {
             Route::get("/", [SupplierController::class, "index"])->name('supplier');
             Route::post("/", [SupplierController::class, "store"])->name('supplier.store');
+            Route::get("/export/excel", [SupplierController::class, "export_excel"])->name('supplier.export.excel');
+            Route::get("/export/pdf", [SupplierController::class, "export_pdf"])->name('supplier.export.pdf');
             Route::put("/{id}", [SupplierController::class, "update"])->name('supplier.update');
             Route::delete("/{id}", [SupplierController::class, "destroy"])->name('supplier.destroy');
         });

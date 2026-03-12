@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Exports\SupplierExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class SupplierController extends Controller
 {
@@ -125,5 +128,17 @@ class SupplierController extends Controller
                 "message" => $th->getMessage(),
             ]);
         }
+    }
+
+    public function export_excel()
+    {
+        return Excel::download(new SupplierExport, 'laporan-supplier.xlsx');
+    }
+
+    public function export_pdf()
+    {
+        $suppliers = Supplier::all();
+        $pdf = Pdf::loadView('pages.exports.supplier', ['suppliers' => $suppliers])->setPaper('a4', 'landscape');
+        return $pdf->download('laporan-supplier.pdf');
     }
 }

@@ -17,6 +17,20 @@
                                     data-bs-target="#addModal">Add Supplier</button>
                             @endif
 
+                            @if (in_array(session()->get('user')->role_id, [2]))
+                                <div class="btn-group mb-3">
+                                    <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown"
+                                        aria-expanded="false">
+                                        Export Data
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="{{ route('supplier.export.excel') }}">Excel</a>
+                                        </li>
+                                        <li><a class="dropdown-item" href="{{ route('supplier.export.pdf') }}">PDF</a></li>
+                                    </ul>
+                                </div>
+                            @endif
+
                             {{-- Add modal --}}
                             <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel"
                                 aria-hidden="true">
@@ -128,13 +142,13 @@
                                                 {{ $s->supplier_address }}
                                             </td>
                                             <td>
-                                                @if($s->supplier_coordinate)
-                                                <a href='https://www.google.com/maps?q={{ $s->supplier_coordinate }}'
-                                                    class="btn btn-success" target="_blank"><i
-                                                        class="mdi mdi-map me-2"></i>
-                                                    Map</a>
+                                                @if ($s->supplier_coordinate)
+                                                    <a href='https://www.google.com/maps?q={{ $s->supplier_coordinate }}'
+                                                        class="btn btn-success" target="_blank"><i
+                                                            class="mdi mdi-map me-2"></i>
+                                                        Map</a>
                                                 @else
-                                                -
+                                                    -
                                                 @endif
                                             </td>
                                             <td>
@@ -154,7 +168,7 @@
                                                             data-bs-target="#updateModal-{{ $s->supplier_id }}"><i
                                                                 class="dropdown-item-icon mdi mdi-pencil-outline me-2"></i>
                                                             Update </button>
-                                                        @if (in_array(session()->get('user')->role_id, [1, 2]))
+                                                        @if (in_array(session()->get('user')->role_id, [2]))
                                                             <button class="dropdown-item" data-id="{{ $s->supplier_id }}"
                                                                 id="delete_supplier"><i
                                                                     class="dropdown-item-icon mdi mdi-close me-2"></i>
@@ -227,7 +241,8 @@
                                                     <div class="modal-body">
                                                         <div class="row">
                                                             <form class="forms-sample" method="POST"
-                                                                action="{{ route('supplier.update', ['id' => $s->supplier_id]) }}" enctype="multipart/form-data">
+                                                                action="{{ route('supplier.update', ['id' => $s->supplier_id]) }}"
+                                                                enctype="multipart/form-data">
                                                                 @csrf
                                                                 @method('PUT')
                                                                 <div class="form-group">
