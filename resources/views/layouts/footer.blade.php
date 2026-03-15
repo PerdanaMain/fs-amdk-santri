@@ -37,7 +37,7 @@
                 <hr>
 
                 <ul>
-                    <li><a href="tel:+62341-303-8888"><i class="fas fa-brands fa-whatsapp"></i>+62
+                    <li><a href="https://wa.me/6282245429508" target="_blank" rel="noopener"><i class="fas fa-brands fa-whatsapp"></i>+62
                             82245429508</a>
                     </li>
                     <li><a href="mailto:sdasantri@gmail.com"><i class="fas fa-envelope"></i> sdasantri@gmail.com</a></li>

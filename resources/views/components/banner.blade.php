@@ -6,11 +6,13 @@
                 <div class="left-content header-text wow fadeInLeft" data-wow-duration="1s" data-wow-delay="1s">
                     <h2
                         style="color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); font-size: 3.5rem; line-height: 1.2;">
-                        Kesegaran Murni <br>dari Alam, Langsung <br>ke Tangan Anda
+                        Kesegaran Murni <br>dari Alam, Untuk penuhi kebutuhan <br>Anda
                     </h2>
                     <div class="mt-4">
                         <button class="btn btn-light text-success fw-bold px-5 py-3 rounded-pill shadow"
-                            style="color: #0e8433; font-weight: 800;" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Pesan Sekarang</button>
+                            style="color: #0e8433; font-weight: 800;"
+                            onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Pesan
+                            Sekarang</button>
                     </div>
                 </div>
             </div>
