@@ -81,7 +81,7 @@
                 </tr>
             @endforeach
             <tr>
-                <td colspan="2" style="text-align: right; font-weight: bold;">Total</td>
+                <td colspan="3" style="text-align: right; font-weight: bold;">Total</td>
                 <td style="font-weight: bold;">{{ $purchase->sum('purchase_quantity') }}</td>
                 <td></td>
                 <td style="font-weight: bold;">{{ number_format($purchase->sum('purchase_total'), 0, ',', '.') }}</td>

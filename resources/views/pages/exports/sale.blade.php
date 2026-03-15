@@ -87,7 +87,7 @@
                 <td colspan="5" style="text-align: right; font-weight: bold;">Total</td>
                 <td style="font-weight: bold;">{{ $sales->sum('sale_quantity') }}</td>
                 <td></td>
-                <td style="font-weight: bold;">Rp {{ number_format($sales->sum('sale_total'), 0, ',', '.') }}</td>
+                <td style="font-weight: bold;">{{ number_format($sales->sum('sale_total'), 0, ',', '.') }}</td>
                 <td colspan="2"></td>
             </tr>
         </tbody>

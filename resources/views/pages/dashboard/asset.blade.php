@@ -89,6 +89,12 @@
                                                         required>
                                                 </div>
                                                 <div class="form-group">
+                                                    <label for="lifetime_years">Life Time (Tahun) <span
+                                                            style="color:red">*</span></label>
+                                                    <input type="number" class="form-control" name="lifetime_years"
+                                                        min="1" value="4" required>
+                                                </div>
+                                                <div class="form-group">
                                                     <label for="asset_photo">Foto Aset</label>
                                                     <input type="file" class="form-control" name="asset_photo">
                                                 </div>
@@ -143,16 +149,20 @@
                                                     -
                                                 @endif
                                             </td>
-                                            <td>
-                                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
-                                                    data-bs-target="#updateModal-{{ $asset->asset_id }}">
-                                                    <i class="mdi mdi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-danger btn-sm" id="delete_asset"
-                                                    data-id="{{ $asset->asset_id }}">
-                                                    <i class="mdi mdi-delete"></i>
-                                                </button>
-                                            </td>
+                                            @if (in_array(session()->get('user')->role_id, [2, 5, 6]))
+                                                <td>
+                                                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                                                        data-bs-target="#updateModal-{{ $asset->asset_id }}">
+                                                        <i class="mdi mdi-pencil"></i>
+                                                    </button>
+                                                    <button class="btn btn-danger btn-sm" id="delete_asset"
+                                                        data-id="{{ $asset->asset_id }}">
+                                                        <i class="mdi mdi-delete"></i>
+                                                    </button>
+                                                </td>
+                                            @else
+                                                <td>-</td>
+                                            @endif
                                         </tr>
 
                                         {{-- Photo Modal --}}
@@ -217,6 +227,13 @@
                                                                 <input type="number" class="form-control"
                                                                     name="purchase_price"
                                                                     value="{{ $asset->purchase_price }}" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label>Life Time (Tahun) <span
+                                                                        style="color:red">*</span></label>
+                                                                <input type="number" class="form-control"
+                                                                    name="lifetime_years" min="1"
+                                                                    value="{{ $asset->lifetime_years ?? 4 }}" required>
                                                             </div>
                                                             <div class="form-group">
                                                                 <label>Ganti Foto (Opsional)</label>

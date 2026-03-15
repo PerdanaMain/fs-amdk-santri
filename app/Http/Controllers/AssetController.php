@@ -37,6 +37,7 @@ class AssetController extends Controller
             'asset_name' => 'required|string',
             'purchase_date' => 'required|date',
             'purchase_price' => 'required|numeric',
+            'lifetime_years' => 'required|integer|min:1',
             'asset_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
@@ -48,8 +49,7 @@ class AssetController extends Controller
             $photoPath = $filename;
         }
 
-        // Automatic Lifetime Calculation (Standard 25% = 4 Years)
-        $lifetimeYears = 4;
+        $lifetimeYears = (int) $request->lifetime_years;
 
         // Calculate depreciation per month
         // Rumus: Harga Beli / (Tahun * 12)
@@ -79,18 +79,21 @@ class AssetController extends Controller
             'asset_name' => 'required|string',
             'purchase_date' => 'required|date',
             'purchase_price' => 'required|numeric',
+            'lifetime_years' => 'required|integer|min:1',
             'asset_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
+
+        $lifetimeYears = (int) $request->lifetime_years;
 
         $data = [
             'asset_name' => $request->asset_name,
             'purchase_date' => $request->purchase_date,
             'purchase_price' => $request->purchase_price,
-            'lifetime_years' => 4, // Default 4 Years
+            'lifetime_years' => $lifetimeYears,
         ];
 
         // Recalculate depreciation if price or lifetime changes
-        $data['depreciation_per_month'] = $request->purchase_price / (4 * 12);
+        $data['depreciation_per_month'] = $request->purchase_price / ($lifetimeYears * 12);
 
         if ($request->hasFile('asset_photo')) {
             // Delete old photo
