@@ -3,7 +3,7 @@
     <div class="container footer-content">
         <div class="row">
             <div class="col-md-3 col-sm-12 my-4">
-                <img src="assets/images/logo-air-santri.png" alt="">
+                <img src="{{ asset('assets/images/logo-air-santri.png') }}" alt="">
             </div>
             <div class="col-md-3 col-sm-12 my-4">
                 <h3>Office</h3>
@@ -40,7 +40,10 @@
                     <li><a href="tel:+62341-303-8888"><i class="fas fa-brands fa-whatsapp"></i>+62
                             82245429508</a>
                     </li>
-                    <li><a href="mailto: amdksantri@gmail.com"></li>
+                    <li><a href="mailto:sdasantri@gmail.com"><i class="fas fa-envelope"></i> sdasantri@gmail.com</a></li>
+                    <li><a href="https://www.tiktok.com/@santrisda2" target="_blank" rel="noopener"><i class="fab fa-tiktok"></i> @santrisda2</a></li>
+                    <li><a href="https://www.instagram.com/sdasantri/" target="_blank" rel="noopener"><i class="fab fa-instagram"></i> sdasantri</a></li>
+                    <li><a href="https://www.facebook.com/search/top?q=Sentra%20Ar%20dan%20Gas" target="_blank" rel="noopener"><i class="fab fa-facebook"></i> Sentra Ar dan Gas</a></li>
 
                 </ul>
             </div>
