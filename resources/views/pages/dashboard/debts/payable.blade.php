@@ -99,7 +99,8 @@
                                             <td>Rp {{ number_format($p->purchase_price, 0, ',', '.') }}</td>
                                             <td>Rp {{ number_format($p->purchase_total, 0, ',', '.') }}</td>
                                             <td>-</td> {{-- Purchase table doesn't have due date yet, unlike Sales --}}
-                                            <td>{{ $p->created_at->setTimezone('Asia/Jakarta')->format('d-m-Y H:i:s') }}</td>
+                                            <td>{{ $p->created_at->setTimezone('Asia/Jakarta')->format('d-m-Y H:i:s') }}
+                                            </td>
                                             <td>
                                                 <label
                                                     class="badge {{ $p->payment_status == 'Lunas' ? 'badge-success' : 'badge-danger' }}">
@@ -107,10 +108,16 @@
                                                 </label>
                                             </td>
                                             <td>
-                                                <button class="btn btn-success btn-sm" id="pay_purchase"
-                                                    data-id="{{ $p->purchase_id }}">
-                                                    <i class="mdi mdi-cash-multiple me-1"></i> Bayar
-                                                </button>
+                                                @if (in_array(session()->get('user')->role_id, [1, 2, 5, 6]))
+                                                    <button class="btn btn-success btn-sm" id="pay_purchase"
+                                                        data-id="{{ $p->purchase_id }}">
+                                                        <i class="mdi mdi-cash-multiple me-1"></i> Bayar
+                                                    </button>
+                                                @else
+                                                    <button class="btn btn-secondary btn-sm" disabled>
+                                                        -
+                                                    </button>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach

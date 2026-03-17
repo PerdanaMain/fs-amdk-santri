@@ -12,7 +12,7 @@
                     <div class="card-body">
                         <h4 class="card-title">Air Mineral Stocks</h4>
                         <div class="d-block my-4">
-                            @if (in_array(session()->get('user')->role_id, [1, 2]))
+                            @if (in_array(session()->get('user')->role_id, [1, 2, 5, 6]))
                                 <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal"
                                     data-bs-target="#addModal">Add Stock</button>
 
@@ -149,7 +149,7 @@
                                                         data-bs-target="#infoModal-{{ $stock->stock_id }}"><i
                                                             class="dropdown-item-icon mdi mdi-information-outline me-2"></i>
                                                         Info </button>
-                                                    @if (in_array(session()->get('user')->role_id, [1, 2]))
+                                                    @if (in_array(session()->get('user')->role_id, [1, 2, 5, 6]))
                                                         <button class="dropdown-item" data-bs-toggle="modal"
                                                             data-bs-target="#updateModal-{{ $stock->stock_id }}"><i
                                                                 class="dropdown-item-icon mdi mdi-pencil-outline me-2"></i>

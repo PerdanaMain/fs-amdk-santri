@@ -19,7 +19,7 @@
                                     data-bs-target="#importModal">Import Customer</button>
                             @endif
 
-                            @if (in_array(session()->get('user')->role_id, [2]))
+                            @if (in_array(session()->get('user')->role_id, [2, 5, 6]))
                                 <button type="button" class="btn btn-success me-2 mb-3" data-bs-toggle="modal"
                                     data-bs-target="#exportModal">Export Customer</button>
                             @endif
@@ -286,12 +286,12 @@
                                                         <i class="dropdown-item-icon mdi mdi-information-outline me-2"></i>
                                                         Info
                                                     </a>
-                                                    @if (in_array(session()->get('user')->role_id, [1, 2]))
+                                                    @if (in_array(session()->get('user')->role_id, [1, 2, 5, 6]))
                                                         <button class="dropdown-item" data-bs-toggle="modal"
                                                             data-bs-target="#updateModal-{{ $c->customer_id }}"><i
                                                                 class="dropdown-item-icon mdi mdi-pencil-outline me-2"></i>
                                                             Update </button>
-                                                        @if (in_array(session()->get('user')->role_id, [2]))
+                                                        @if (in_array(session()->get('user')->role_id, [2, 5, 6]))
                                                             <button class="dropdown-item" data-id="{{ $c->customer_id }}"
                                                                 id="delete_customer"><i
                                                                     class="dropdown-item-icon mdi mdi-close me-2"></i>

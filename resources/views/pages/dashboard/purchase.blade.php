@@ -249,7 +249,7 @@
                                                         Info </button>
 
                                                     @if ($p->payment_status == 'Belum Lunas')
-                                                        @if (in_array(auth()->user()->role_id, [1, 2]))
+                                                        @if (in_array(auth()->user()->role_id, [1, 2, 5, 6]))
                                                             <button class="dropdown-item" id="pay_purchase"
                                                                 data-id="{{ $p->purchase_id }}"><i
                                                                     class="dropdown-item-icon mdi mdi-cash-multiple me-2"></i>
@@ -271,7 +271,7 @@
                                                                 class="dropdown-item-icon mdi mdi-delete-outline me-2"></i>
                                                             Delete</button>
                                                     @else
-                                                        @if (session()->get('user')->role_id == 2)
+                                                        @if (in_array(session()->get('user')->role_id, [2, 5, 6]))
                                                             @if ($p->status->status_id == 3)
                                                                 <button class="dropdown-item"
                                                                     data-id="{{ $p->purchase_id }}"

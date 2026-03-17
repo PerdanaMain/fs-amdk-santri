@@ -17,7 +17,7 @@
                                     data-bs-target="#addModal">Add Supplier</button>
                             @endif
 
-                            @if (in_array(session()->get('user')->role_id, [2]))
+                            @if (in_array(session()->get('user')->role_id, [2, 5, 6]))
                                 <div class="btn-group mb-3">
                                     <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown"
                                         aria-expanded="false">
@@ -129,7 +129,7 @@
                                         <tr>
                                             <td>
                                                 @if ($s->supplier_photo == null)
-                                                    <img src="{{ url('dashboards/images/faces/face1.jpg') }}"
+                                                    <img src="{{ asset('dashboards/images/faces/face1.jpg') }}"
                                                         alt="image" />
                                                 @else
                                                     <img src="{{ url('storage/suppliers/' . $s->supplier_photo) }}"
@@ -168,7 +168,7 @@
                                                             data-bs-target="#updateModal-{{ $s->supplier_id }}"><i
                                                                 class="dropdown-item-icon mdi mdi-pencil-outline me-2"></i>
                                                             Update </button>
-                                                        @if (in_array(session()->get('user')->role_id, [2]))
+                                                        @if (in_array(session()->get('user')->role_id, [2, 5, 6]))
                                                             <button class="dropdown-item" data-id="{{ $s->supplier_id }}"
                                                                 id="delete_supplier"><i
                                                                     class="dropdown-item-icon mdi mdi-close me-2"></i>
@@ -194,7 +194,7 @@
                                                         <div class="row">
                                                             <div class="col-md-12 col-sm-12 mb-2">
                                                                 @if ($s->supplier_photo == null)
-                                                                    <img src="{{ url('dashboards/images/faces/face1.jpg') }}"
+                                                                    <img src="{{ asset('dashboards/images/faces/face1.jpg') }}"
                                                                         alt="image" />
                                                                 @else
                                                                     <img src="{{ url('storage/suppliers/' . $s->supplier_photo) }}"

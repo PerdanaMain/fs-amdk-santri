@@ -14,7 +14,7 @@
                         <div class="d-block my-4">
                             <button type="button" class="btn btn-primary me-2 mb-3" data-bs-toggle="modal"
                                 data-bs-target="#addModal">Add Employee</button>
-                                
+
                             @if (auth()->user()->role_id == 2)
                                 <button type="button" class="btn btn-success me-2 mb-3" data-bs-toggle="modal"
                                     data-bs-target="#exportModal">Export Employee</button>
@@ -319,7 +319,7 @@
                                                             <div class="col-md-6 col-sm-12">
                                                                 <p>
                                                                     <b>Email: </b>
-                                                                    {{ $user->email }}
+                                                                    {{ strtolower($user->email) }}
                                                                 </p>
                                                                 <p>
                                                                     <b>Jumlah Pic (Customer):</b>

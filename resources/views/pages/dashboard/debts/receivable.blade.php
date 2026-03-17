@@ -96,7 +96,8 @@
                                             <td>{{ $s->stock->stock_name }}</td>
                                             <td>Rp {{ number_format($s->sale_total, 0, ',', '.') }}</td>
                                             <td>{{ $s->sale_date ? date('d-m-Y', strtotime($s->sale_date)) : '-' }}</td>
-                                            <td>{{ $s->created_at->setTimezone('Asia/Jakarta')->format('d-m-Y H:i:s') }}</td>
+                                            <td>{{ $s->created_at->setTimezone('Asia/Jakarta')->format('d-m-Y H:i:s') }}
+                                            </td>
                                             <td>
                                                 <label
                                                     class="badge {{ $s->payment_status == 'Lunas' ? 'badge-success' : 'badge-danger' }}">
@@ -104,10 +105,16 @@
                                                 </label>
                                             </td>
                                             <td>
-                                                <button class="btn btn-success btn-sm" id="pay_sales"
-                                                    data-id="{{ $s->sale_id }}">
-                                                    <i class="mdi mdi-cash-multiple me-1"></i> Terima Pembayaran
-                                                </button>
+                                                @if (in_array(session()->get('user')->role_id, [1, 2, 5, 6]))
+                                                    <button class="btn btn-success btn-sm" id="pay_sales"
+                                                        data-id="{{ $s->sale_id }}">
+                                                        <i class="mdi mdi-cash-multiple me-1"></i> Terima Pembayaran
+                                                    </button>
+                                                @else
+                                                    <button class="btn btn-secondary btn-sm" disabled>
+                                                        -
+                                                    </button>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
