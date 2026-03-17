@@ -29,9 +29,13 @@
                                             <div class="col-md-6 col-lg-6 grid-margin stretch-card">
                                                 <div class="card card-rounded">
                                                     <div class="card-body">
-                                                        <p class="statistics-title">Employees</p>
-                                                        <h3 class="rate-percentage">{{ $users }}</h3>
-                                                        <p class="text-primary d-flex"><span>Persons</span></p>
+                                                        <div class="row">
+                                                            <div class="col-6">
+                                                                <p class="statistics-title">Suppliers</p>
+                                                                <h3 class="rate-percentage">{{ $suppliers }}</h3>
+                                                                <p class="text-primary d-flex"><span>Persons</span></p>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -93,7 +97,8 @@
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <h3 class="rate-percentage">
-                                                                    Rp {{ number_format($totalReceivable, 0, ',', '.') }}</h3>
+                                                                    Rp {{ number_format($totalReceivable, 0, ',', '.') }}
+                                                                </h3>
                                                                 <p class="text-primary d-flex"><span>Total
                                                                         Piutang </span>
                                                                 </p>
@@ -183,7 +188,8 @@
                                             <div class="card card-rounded">
                                                 <div class="card-body">
                                                     <h4 class="card-title card-title-dash">Product Statistics</h4>
-                                                    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                                                    <div class="table-responsive"
+                                                        style="max-height: 300px; overflow-y: auto;">
                                                         <table class="table table-striped">
                                                             <thead>
                                                                 <tr>
@@ -197,7 +203,7 @@
                                                                     <tr>
                                                                         <td>{{ $recentSale->stock_name }}</td>
                                                                         <td>{{ $recentSale->total_sale_data }}</td>
-                                                                        <td>Rp{{ number_format($recentSale->total_sale_transactions, 2, ',', '.') }}
+                                                                        <td>Rp{{ number_format((float) ($recentSale->total_sale_transactions ?? 0), 0, ',', '.') }}
                                                                         </td>
                                                                     </tr>
                                                                 @endforeach
@@ -225,25 +231,22 @@
                                                         </div>
                                                         <div class="col-md-6 d-flex align-items-center">
                                                             <ul class="list-unstyled">
-                                                                <li class="mb-3"><i
-                                                                        class="mdi mdi-circle me-2"
+                                                                <li class="mb-3"><i class="mdi mdi-circle me-2"
                                                                         style="color: #4B49AC;"></i> Total
                                                                     Penjualan: <b>Rp
-                                                                        {{ number_format($totalSale, 0, ',', '.') }}</b></li>
-                                                                <li class="mb-3"><i
-                                                                        class="mdi mdi-circle me-2"
+                                                                        {{ number_format($totalSale, 0, ',', '.') }}</b>
+                                                                </li>
+                                                                <li class="mb-3"><i class="mdi mdi-circle me-2"
                                                                         style="color: #FFC100;"></i> Total
                                                                     Pembelian: <b>Rp
                                                                         {{ number_format($totalPurchase, 0, ',', '.') }}</b>
                                                                 </li>
-                                                                <li class="mb-3"><i
-                                                                        class="mdi mdi-circle me-2"
+                                                                <li class="mb-3"><i class="mdi mdi-circle me-2"
                                                                         style="color: #FF4747;"></i> Total
                                                                     Hutang: <b>Rp
                                                                         {{ number_format($totalPayable, 0, ',', '.') }}</b>
                                                                 </li>
-                                                                <li class="mb-3"><i
-                                                                        class="mdi mdi-circle me-2"
+                                                                <li class="mb-3"><i class="mdi mdi-circle me-2"
                                                                         style="color: #57B657;"></i> Total
                                                                     Piutang: <b>Rp
                                                                         {{ number_format($totalReceivable, 0, ',', '.') }}</b>

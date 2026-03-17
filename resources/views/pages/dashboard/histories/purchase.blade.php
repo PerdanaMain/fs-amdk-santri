@@ -96,6 +96,7 @@
                                         <th>Jumlah Pembelian</th>
                                         <th>Harga Satuan</th>
                                         <th>Total Harga</th>
+                                        <th>Tgl Transaksi</th>
                                         <th>Status</th>
                                         <th>Status Pembayaran</th>
                                         <th>Actions</th>
@@ -109,6 +110,7 @@
                                             <td>{{ $p->purchase_quantity }} {{ $p->stock->stock_satuan }}</td>
                                             <td>Rp {{ number_format($p->purchase_price, 0, ',', '.') }}</td>
                                             <td>Rp {{ number_format($p->purchase_total, 0, ',', '.') }}</td>
+                                            <td>{{ $p->created_at->format('d-m-Y H:i:s') }}</td>
                                             <td>
                                                 @switch($p->status_id)
                                                     @case(1)

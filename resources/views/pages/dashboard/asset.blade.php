@@ -121,6 +121,7 @@
                                         <th>Life Time</th>
                                         <th>Deviasi / Bulan</th>
                                         <th>Nilai Aset Saat Ini</th>
+                                        <th>Tgl Dibuat</th>
                                         <th>Foto</th>
                                         <th>Actions</th>
                                     </tr>
@@ -139,6 +140,7 @@
                                                     Rp {{ number_format($asset->current_value, 0, ',', '.') }}
                                                 </span>
                                             </td>
+                                            <td>{{ $asset->created_at->format('d-m-Y H:i:s') }}</td>
                                             <td>
                                                 @if ($asset->asset_photo)
                                                     <button class="btn btn-info btn-sm" data-bs-toggle="modal"

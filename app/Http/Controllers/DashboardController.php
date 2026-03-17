@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Purchase;
 use App\Models\Sale;
 use App\Models\Stock;
+use App\Models\Supplier;
 use App\Models\User;
 use Carbon\Carbon;
 
@@ -20,12 +21,19 @@ class DashboardController extends Controller
         $totalSale = Sale::where("status_id", 2)->sum("sale_total");
         $purchases = Purchase::where("status_id", 4)->get()->count();
         $totalPurchase = Purchase::where("status_id", 4)->sum("purchase_total");
+        $suppliers = Supplier::all()->count();
 
-        $products = Stock::withCount(['sales as total_sale_data' => function ($q) {
-            $q->where('status_id', 2);
-        }])->withSum(['sales as total_sale_transactions' => function ($q) {
-            $q->where('status_id', 2);
-        }], 'sale_total')->get();
+        $products = Stock::query()
+            ->leftJoin('sales', function ($join) {
+                $join->on('stocks.stock_id', '=', 'sales.stock_id')
+                    ->where('sales.status_id', 2);
+            })
+            ->select('stocks.stock_id', 'stocks.stock_name')
+            ->selectRaw('COUNT(sales.sale_id) as total_sale_data')
+            ->selectRaw('COALESCE(SUM(sales.sale_total), 0) as total_sale_transactions')
+            ->groupBy('stocks.stock_id', 'stocks.stock_name')
+            ->orderByDesc('total_sale_transactions')
+            ->get();
 
         $salesByMonth = [];
         $purchaseByMonth = [];
@@ -136,7 +144,8 @@ class DashboardController extends Controller
                 "totalPayable",
                 "totalReceivable",
                 "totalSale",
-                "totalPurchase"
+                "totalPurchase",
+                "suppliers",
             )
         );
     }

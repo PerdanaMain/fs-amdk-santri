@@ -24,6 +24,7 @@
                                         <th>Nama Customer</th>
                                         <th>Alamat Customer</th>
                                         <th>Peta</th>
+                                        <th>Tgl Transaksi</th>
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
@@ -39,6 +40,7 @@
                                                     <i class="mdi mdi-map-marker-circle"></i>
                                                 </a>
                                             </td>
+                                            <td>{{ $ship->created_at->format('d-m-Y H:i:s') }}</td>
                                             <td>
                                                 <label class="badge badge-success">{{ $ship->shipment_status }}</label>
                                             </td>
