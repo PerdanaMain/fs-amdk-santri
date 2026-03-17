@@ -8,6 +8,7 @@ use App\Models\Payment;
 use App\Models\Purchase;
 use App\Models\Stock;
 use App\Models\Supplier;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -91,7 +92,7 @@ class PurchaseController extends Controller
             if ($format == 1) {
                 return Excel::download(new PurchaseExport($purchase), 'purchases_list.xlsx');
             } else {
-                $pdf = \PDF::loadView('pages.exports.purchase', compact('purchase'))
+                $pdf = Pdf::loadView('pages.exports.purchase', compact('purchase'))
                     ->setPaper('a4', 'landscape');
                 return $pdf->download('Data-Pembelian-List.pdf');
             }
@@ -122,9 +123,9 @@ class PurchaseController extends Controller
             if ($status !== null && $status !== "") {
                 $status = (int) $status;
                 if ($status == 0) {
-                     $purchase = $purchase->whereNotIn("status_id", [1, 2, 3, 6]);
+                    $purchase = $purchase->whereNotIn("status_id", [1, 2, 3, 6]);
                 } else {
-                     $purchase = $purchase->where("status_id", $status);
+                    $purchase = $purchase->where("status_id", $status);
                 }
             } else {
                 $purchase = $purchase->whereNotIn("status_id", [1, 2, 3, 6]);
@@ -145,7 +146,7 @@ class PurchaseController extends Controller
             if ($format == 1) {
                 return Excel::download(new PurchaseExport($purchase), 'purchases.xlsx');
             } else {
-                $pdf = \PDF::loadView('pages.exports.purchase', compact('purchase'))
+                $pdf = Pdf::loadView('pages.exports.purchase', compact('purchase'))
                     ->setPaper('a4', 'landscape');
                 return $pdf->download('Data-Pembelian.pdf');
             }
@@ -222,9 +223,25 @@ class PurchaseController extends Controller
     {
         try {
             $purchase = Purchase::where("purchase_id", $id);
+            $purchaseData = $purchase->firstOrFail();
+
             $purchase->update([
                 "payment_status" => "Lunas",
             ]);
+
+            if ((int) $purchaseData->status_id === 4 && $purchaseData->finance_id == null) {
+                $finance = Finance::create([
+                    "finance_code" => "P-" . rand(1, 99999999),
+                    "finance_name" => "Pembelian " . $purchaseData->purchase_description,
+                    "finance_debet" => 0,
+                    "finance_credit" => $purchaseData->purchase_total,
+                    "finance_description" => "Pembelian " . $purchaseData->purchase_description,
+                ]);
+
+                $purchase->update([
+                    "finance_id" => $finance->finance_id,
+                ]);
+            }
 
             return response()->json([
                 "status" => true,
@@ -281,7 +298,7 @@ class PurchaseController extends Controller
     {
         try {
             $user = session()->get("user");
-            if ($user->role_id !== 2) {
+            if (!in_array($user->role_id, [2, 5, 6])) {
                 return response()->json([
                     "status" => false,
                     "message" => "Anda tidak memiliki akses untuk menyetujui data pembelian.",
@@ -289,29 +306,28 @@ class PurchaseController extends Controller
             }
 
             $purchase = Purchase::where("purchase_id", $id);
+            $purchaseData = $purchase->firstOrFail();
 
-            if ($purchase->first()->payment_status !== "Lunas") {
-                return response()->json([
-                    "status" => false,
-                    "message" => "Data pembelian tidak dapat disetujui karena pembayaran belum lunas.",
-                ])->setStatusCode(403);
-            }
-
-            Stock::where("stock_id", $purchase->first()->stock_id)
-                ->increment("stock_quantity", $purchase->first()->purchase_quantity);
-
-            $finance = Finance::create([
-                "finance_code" => "P-" . rand(1, 99999999),
-                "finance_name" => "Pembelian " . $purchase->first()->purchase_description,
-                "finance_debet" => 0,
-                "finance_credit" => $purchase->first()->purchase_total,
-                "finance_description" => "Pembelian " . $purchase->first()->purchase_description,
-            ]);
+            Stock::where("stock_id", $purchaseData->stock_id)
+                ->increment("stock_quantity", $purchaseData->purchase_quantity);
 
             $purchase->update([
                 "status_id" => 4,
-                "finance_id" => $finance->finance_id,
             ]);
+
+            if ($purchaseData->payment_status === "Lunas" && $purchaseData->finance_id == null) {
+                $finance = Finance::create([
+                    "finance_code" => "P-" . rand(1, 99999999),
+                    "finance_name" => "Pembelian " . $purchaseData->purchase_description,
+                    "finance_debet" => 0,
+                    "finance_credit" => $purchaseData->purchase_total,
+                    "finance_description" => "Pembelian " . $purchaseData->purchase_description,
+                ]);
+
+                $purchase->update([
+                    "finance_id" => $finance->finance_id,
+                ]);
+            }
 
             return response()->json([
                 "status" => true,
