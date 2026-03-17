@@ -74,6 +74,7 @@
                                                         <select id="stock_select" class="form-select" name="stock_satuan">
                                                             <option value="Dus" selected>Dus</option>
                                                             <option value="Galon">Galon</option>
+                                                            <option value="Buah">Buah</option>
                                                         </select>
 
                                                     </div>
