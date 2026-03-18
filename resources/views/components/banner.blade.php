@@ -1,4 +1,12 @@
 <div class="main-banner wow fadeIn" id="top" data-wow-duration="1s" data-wow-delay="0.5s">
+    <style>
+        #top.main-banner {
+            background-image: url('{{ asset('assets/images/bg-mountain.jpg') }}') !important;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
     <div class="container">
         {{-- <img src="{{ asset('assets/images/bg-mountain.jpg') }}" alt="gambar-gunung"> --}}
         <div class="row align-items-center">
