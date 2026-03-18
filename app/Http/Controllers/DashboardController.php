@@ -103,7 +103,7 @@ class DashboardController extends Controller
 
         $summaryData = [
             'labels' => ['Penjualan', 'Pembelian', 'Hutang', 'Piutang'],
-            'data' => [$totalSale, $totalPurchase, $totalPayable, $totalReceivable],
+            'data' => [(float)$totalSale, (float)$totalPurchase, (float)$totalPayable, (float)$totalReceivable],
             'colors' => ['#1F3BB3', '#FFAB00', '#FF4747', '#00D25B']
         ];
 
