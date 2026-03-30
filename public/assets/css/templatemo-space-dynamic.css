@@ -689,6 +689,10 @@ header
     .background-header .main-nav .nav {
         margin-top: 80px !important;
     }
+    .header-area .main-nav .nav li:last-child,
+    .background-header .main-nav .nav li:last-child {
+        display: block;
+    }
     .header-area .main-nav .logo {
         color: #1e1e1e;
     }
@@ -756,6 +760,14 @@ header
     .header-area .main-nav .nav li a:hover {
         background: #eee !important;
         color: #fe3f40 !important;
+    }
+    .header-area .main-nav .nav li:last-child a {
+        background: #128332 !important;
+        color: #fff !important;
+    }
+    .header-area .main-nav .nav li:last-child a:hover {
+        background: #128332 !important;
+        color: #fff !important;
     }
     .header-area .main-nav .nav li.submenu ul {
         position: relative;
