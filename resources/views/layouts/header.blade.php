@@ -21,6 +21,10 @@
                         <li class="scroll-to-section"><a href="/about"
                                 class="{{ Route::currentRouteName() == 'about' ? 'active' : '' }}">About Us</a></li>
                         <li class="scroll-to-section">
+                            <a href="/login" role="button" data-bs-toggle="modal" data-bs-target="#loginModal">Sign
+                                In</a>
+                        </li>
+                        <li class="scroll-to-section">
                             <div class="main-blue-button">
                                 <a href="/login" role="button" data-bs-toggle="modal"
                                     data-bs-target="#loginModal">Sign
