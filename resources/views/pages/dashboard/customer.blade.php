@@ -12,7 +12,7 @@
                     <div class="card-body">
                         <h4 class="card-title">Data Customer</h4>
                         <div class="d-block my-4">
-                            @if (!in_array(session()->get('user')->role_id, [1, 4, 5, 6]))
+                            @if (in_array(session()->get('user')->role_id, [1, 2, 4, 5, 6]))
                                 <button type="button" class="btn btn-primary me-2 mb-3" data-bs-toggle="modal"
                                     data-bs-target="#addModal">Add Customer</button>
                                 <button type="button" class="btn btn-warning me-2 mb-3" data-bs-toggle="modal"
