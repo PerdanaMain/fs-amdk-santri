@@ -2,12 +2,17 @@
 <nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex align-items-top flex-row">
     <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
         <div class="me-3">
-            <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-bs-toggle="minimize">
+            <button class="navbar-toggler align-self-center d-none d-lg-inline-block" type="button"
+                data-bs-toggle="minimize">
+                <span class="icon-menu"></span>
+            </button>
+            <button class="navbar-toggler navbar-toggler-right align-self-center d-lg-none" type="button"
+                data-toggle="offcanvas">
                 <span class="icon-menu"></span>
             </button>
         </div>
         <div>
-            <a class="navbar-brand" href="/dasboard">
+            <a class="navbar-brand d-none d-sm-inline-block" href="/dashboard">
                 <span style="color: #0362a6; font-weight:600;">
                     AMDK <b style="color: #008000">Santri</b>
                 </span>
@@ -68,10 +73,6 @@
                 </div>
             </li>
         </ul>
-        <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
-            data-bs-toggle="offcanvas">
-            <span class="mdi mdi-menu"></span>
-        </button>
     </div>
 </nav>
 <!-- partial -->

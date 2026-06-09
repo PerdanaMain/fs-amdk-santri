@@ -7,11 +7,14 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DebtController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FinanceController;
+use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicMediaController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\StockController;
+use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VisitController;
 use Illuminate\Support\Facades\Route;
@@ -31,7 +34,8 @@ Route::group(["prefix" => "/"], function () {
      */
     Route::middleware(["guest"])->group(function () {
         Route::get("", function () {
-            return view('pages.welcome');
+            $medias = \App\Models\Media::orderBy('created_at', 'desc')->take(3)->get();
+            return view('pages.welcome', compact('medias'));
         })->name('home');
 
         Route::get('/product', function () {
@@ -45,6 +49,9 @@ Route::group(["prefix" => "/"], function () {
         Route::get('/about', function () {
             return view('pages.about');
         })->name('about');
+
+        Route::get('/media', [PublicMediaController::class, 'index'])->name('media.public');
+        Route::get('/media/{id}', [PublicMediaController::class, 'show'])->name('media.detail');
 
         Route::post("/feedbacks", [LoginController::class, "feedback"])->name("feedbacks");
         Route::put("/reset-submission/{email}", [UserController::class, "resetSubmission"])->name("user.resetSubmission");
@@ -71,6 +78,7 @@ Route::group(["prefix" => "/"], function () {
         Route::prefix("stocks")->group(function () {
             Route::get('/', [StockController::class, 'index'])->name('stocks.index');
             Route::post('/', [StockController::class, 'store'])->name('stocks.store');
+            Route::post('/export', [StockController::class, 'export'])->name('stocks.export');
 
             Route::put('/{id}', [StockController::class, 'update'])->name('stocks.update');
             Route::delete('/{id}', [StockController::class, 'destroy'])->name('stocks.destroy');
@@ -95,6 +103,15 @@ Route::group(["prefix" => "/"], function () {
             Route::get("/template", [CustomerController::class, "template"])->name("customer.template");
         });
 
+        Route::prefix("suppliers")->group(function () {
+            Route::get("/", [SupplierController::class, "index"])->name('supplier');
+            Route::post("/", [SupplierController::class, "store"])->name('supplier.store');
+            Route::get("/export/excel", [SupplierController::class, "export_excel"])->name('supplier.export.excel');
+            Route::get("/export/pdf", [SupplierController::class, "export_pdf"])->name('supplier.export.pdf');
+            Route::put("/{id}", [SupplierController::class, "update"])->name('supplier.update');
+            Route::delete("/{id}", [SupplierController::class, "destroy"])->name('supplier.destroy');
+        });
+
         Route::prefix("visits")->group(function () {
             Route::get("/", [VisitController::class, "index"])->name('visit');
             Route::post("/", [VisitController::class, "store"])->name('visit.store');
@@ -114,6 +131,7 @@ Route::group(["prefix" => "/"], function () {
             Route::get("/", [PurchaseController::class, "index"])->name('purchase');
 
             Route::post("/", [PurchaseController::class, "store"])->name("purchase.store");
+            Route::post("/export", [PurchaseController::class, "exportList"])->name("purchase.export");
             Route::put("/{id}", [PurchaseController::class, "update"])->name("purchase.update");
             Route::delete("/{id}", [PurchaseController::class, "destroy"])->name("purchase.destroy");
             Route::patch("/{id}", [PurchaseController::class, "submit"])->name("purchase.submission");
@@ -133,11 +151,14 @@ Route::group(["prefix" => "/"], function () {
         Route::prefix("debts")->group(function () {
             Route::get("/payable", [DebtController::class, "indexHutang"])->name("debts.payable");
             Route::get("/receivable", [DebtController::class, "indexPiutang"])->name("debts.receivable");
+            Route::post("/payable/export", [DebtController::class, "exportHutang"])->name("debts.payable.export");
+            Route::post("/receivable/export", [DebtController::class, "exportPiutang"])->name("debts.receivable.export");
         });
 
         Route::prefix("sales")->group(function () {
             Route::get("/", [SalesController::class, "index"])->name("sales");
             Route::post("/", [SalesController::class, "store"])->name("sales.store");
+            Route::post("/export", [SalesController::class, "exportList"])->name("sales.export");
             Route::put("/{id}", [SalesController::class, "update"])->name("sales.update");
             Route::delete("/{id}", [SalesController::class, "destroy"])->name("sales.destroy");
             Route::patch("/{id}", [SalesController::class, "submit"])->name("sales.submission");
@@ -181,6 +202,13 @@ Route::group(["prefix" => "/"], function () {
         Route::prefix('profile')->group(function () {
             Route::get("/", [ProfileController::class, "index"])->name('profile');
             Route::put("/{id}", [ProfileController::class, "update"])->name('profile.update');
+        });
+
+        Route::prefix("dashboard/media")->group(function () {
+            Route::get("/", [MediaController::class, "index"])->name("media.index");
+            Route::post("/", [MediaController::class, "store"])->name("media.store");
+            Route::put("/{id}", [MediaController::class, "update"])->name("media.update");
+            Route::delete("/{id}", [MediaController::class, "destroy"])->name("media.destroy");
         });
 
         Route::prefix("user")->group(function () {

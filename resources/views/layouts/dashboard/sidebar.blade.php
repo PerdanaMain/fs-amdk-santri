@@ -23,6 +23,14 @@
                 </a>
             </li>
         @endif
+        @if (in_array(session()->get('user')->role_id, [1, 2, 3, 5, 6]))
+            <li class="nav-item {{ Route::currentRouteName() == 'supplier' ? 'active' : '' }}">
+                <a class="nav-link" href="/suppliers">
+                    <i class="mdi mdi-truck menu-icon"></i>
+                    <span class="menu-title">Suppliers</span>
+                </a>
+            </li>
+        @endif
         @if (session()->get('user')->role_id == 2)
             <li class="nav-item {{ Route::currentRouteName() == 'employee' ? 'active' : '' }}">
                 <a class="nav-link" href="/employees">
@@ -36,6 +44,15 @@
                 <a class="nav-link" href="/feedbacks">
                     <i class="mdi mdi-email-outline menu-icon"></i>
                     <span class="menu-title">Feedbacks</span>
+                </a>
+            </li>
+        @endif
+
+        @if (in_array(session()->get('user')->role_id, [1, 2, 5, 6]))
+            <li class="nav-item {{ Route::currentRouteName() == 'media.index' ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('media.index') }}">
+                    <i class="mdi mdi-folder-image menu-icon"></i>
+                    <span class="menu-title">Media</span>
                 </a>
             </li>
         @endif

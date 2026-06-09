@@ -12,15 +12,14 @@
                     <div class="card-body">
                         <h4 class="card-title">Data Customer</h4>
                         <div class="d-block my-4">
-                            @if (!in_array(session()->get('user')->role_id, [4, 5, 6]))
+                            @if (in_array(session()->get('user')->role_id, [1, 2, 4, 5, 6]))
                                 <button type="button" class="btn btn-primary me-2 mb-3" data-bs-toggle="modal"
                                     data-bs-target="#addModal">Add Customer</button>
-                            @endif
-
-                            @if (in_array(session()->get('user')->role_id, [1, 2]))
                                 <button type="button" class="btn btn-warning me-2 mb-3" data-bs-toggle="modal"
                                     data-bs-target="#importModal">Import Customer</button>
+                            @endif
 
+                            @if (in_array(session()->get('user')->role_id, [2, 5, 6]))
                                 <button type="button" class="btn btn-success me-2 mb-3" data-bs-toggle="modal"
                                     data-bs-target="#exportModal">Export Customer</button>
                             @endif
@@ -233,6 +232,7 @@
                                         <th>Foto Customer</th>
                                         <th>Nama Customer</th>
                                         <th>Nama Pemilik</th>
+                                        <th>Alamat</th>
                                         <th>Transaksi</th>
                                         <th>Lokasi</th>
                                         <th>Petugas</th>
@@ -253,6 +253,9 @@
                                             </td>
                                             <td>{{ $c->customer_name }}</td>
                                             <td>{{ $c->customer_owner }}</td>
+                                            <td class="text-truncate" style="max-width: 250px;">
+                                                {{ $c->customer_address }}
+                                            </td>
                                             <td>
                                                 @if (count($c->sales) > 0)
                                                     <button type="button" class="btn btn-danger me-2"
@@ -278,16 +281,17 @@
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-right navbar-dropdown"
                                                     aria-labelledby="StockDropdown">
-                                                    <a class="dropdown-item" href="{{ route('customer.show', $c->customer_id) }}">
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('customer.show', $c->customer_id) }}">
                                                         <i class="dropdown-item-icon mdi mdi-information-outline me-2"></i>
                                                         Info
                                                     </a>
-                                                    @if (in_array(session()->get('user')->role_id, [1, 2]))
+                                                    @if (in_array(session()->get('user')->role_id, [1, 2, 5, 6]))
                                                         <button class="dropdown-item" data-bs-toggle="modal"
                                                             data-bs-target="#updateModal-{{ $c->customer_id }}"><i
                                                                 class="dropdown-item-icon mdi mdi-pencil-outline me-2"></i>
                                                             Update </button>
-                                                        @if (in_array(session()->get('user')->role_id, [2]))
+                                                        @if (in_array(session()->get('user')->role_id, [2, 5, 6]))
                                                             <button class="dropdown-item" data-id="{{ $c->customer_id }}"
                                                                 id="delete_customer"><i
                                                                     class="dropdown-item-icon mdi mdi-close me-2"></i>

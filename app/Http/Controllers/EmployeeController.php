@@ -22,6 +22,9 @@ class EmployeeController extends Controller
             ->orderBy("user_id", "desc")
             ->get();
         $roles = Role::where("role_id", "!=", 2)->get();
+
+        // dump current authenticated user data for debugging
+        // dd(auth()->user());
         return view(
             'pages.dashboard.employee',
             compact(
@@ -147,7 +150,6 @@ class EmployeeController extends Controller
             }
 
             return back()->with('employee.success', 'Data karyawan berhasil diubah.');
-
         } catch (\Throwable $th) {
             return back()->with('employee.error', $th->getMessage());
         }

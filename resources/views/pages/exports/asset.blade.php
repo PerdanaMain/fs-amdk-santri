@@ -72,6 +72,10 @@
                     <td>Rp {{ number_format($asset->current_value, 0, ',', '.') }}</td>
                 </tr>
             @endforeach
+            <tr>
+                <td colspan="6" style="text-align: right; font-weight: bold;">Total Nilai Aset</td>
+                <td style="font-weight: bold;">Rp {{ number_format($assets->sum('current_value'), 0, ',', '.') }}</td>
+            </tr>
         </tbody>
     </table>
 </body>

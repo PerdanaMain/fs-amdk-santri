@@ -7,6 +7,28 @@
 @section('content.dashboard')
     <div class="content-wrapper">
         <div class="row">
+            {{-- Finance Detail --}}
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-12">
+                                <h4 class="card-title">Total Debit</h4>
+                                <h2 class="text-success">Rp {{ number_format($totalDebet, 0, ',', '.') }}</h2>
+                            </div>
+                            <div class="col-md-4 col-sm-12">
+                                <h4 class="card-title">Total Kredit</h4>
+                                <h2 class="text-danger">Rp {{ number_format($totalCredit, 0, ',', '.') }}</h2>
+                            </div>
+                            <div class="col-md-4 col-sm-12">
+                                <h4 class="card-title">Total Saldo</h4>
+                                <h2 class="text-primary">Rp {{ number_format($totalDebet - $totalCredit, 0, ',', '.') }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="col-lg-12 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
@@ -143,10 +165,11 @@
                                     <tr>
                                         <th>Kode</th>
                                         <th>Transaksi</th>
+                                        <th>Relasi</th>
                                         <th>Debet</th>
                                         <th>Kredit</th>
                                         <th>Dreskripsi</th>
-                                        <th>Tanggal</th>
+                                        <th>Tgl Transaksi</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -155,10 +178,19 @@
                                         <tr>
                                             <td>{{ $finance->finance_code }}</td>
                                             <td>{{ $finance->finance_name }}</td>
+                                            <td>
+                                                @if($finance->purchase && $finance->purchase->stock)
+                                                    {{ $finance->purchase->stock->stock_name }} - {{ $finance->purchase->supplier ? $finance->purchase->supplier->supplier_name : '-' }}
+                                                @elseif($finance->sale && $finance->sale->customer)
+                                                    {{ $finance->sale->customer->customer_name }}
+                                                @else
+                                                    -
+                                                @endif
+                                            </td>
                                             <td>Rp {{ number_format($finance->finance_debet, 0, ',', '.') }}</td>
                                             <td>Rp {{ number_format($finance->finance_credit, 0, ',', '.') }}</td>
                                             <td>{{ $finance->finance_description }}</td>
-                                            <td>{{ date_format(date_create($finance->created_at), 'd-m-Y') }}</td>
+                                            <td>{{ $finance->created_at->setTimezone('Asia/Jakarta')->format('d-m-Y H:i:s') }}</td>
                                             <td>
                                                 <a class="nav-link" id="StockDropdown" href="#"
                                                     data-bs-toggle="dropdown" aria-expanded="false">

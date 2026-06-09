@@ -12,7 +12,7 @@
                     <div class="card-body">
                         <h4 class="card-title">Riwayat Data Penjualan</h4>
                         <div class="d-block my-4">
-                            @if ($user->role_id != 2)
+                            @if (in_array($user->role_id, [1, 2, 5, 6]))
                                 <button type="button" class="btn btn-success me-2 mb-3" data-bs-toggle="modal"
                                     data-bs-target="#exportModal">Export Penjualan</button>
                             @endif
@@ -87,6 +87,7 @@
                                         <th>Jumlah Barang</th>
                                         <th>Harga Satuan</th>
                                         <th>Total Harga</th>
+                                        <th>Tgl Transaksi</th>
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
@@ -99,6 +100,8 @@
                                             <td>{{ $sale->sale_quantity }}</td>
                                             <td>Rp {{ number_format($sale->sale_price, 0, ',', '.') }}</td>
                                             <td>Rp {{ number_format($sale->sale_total, 0, ',', '.') }}</td>
+                                            <td>{{ $sale->created_at->setTimezone('Asia/Jakarta')->format('d-m-Y H:i:s') }}
+                                            </td>
                                             <td><label
                                                     class="badge 
                                       {{ $sale->status->status_id == 1 || $sale->status->status_id == 3

@@ -46,6 +46,17 @@
                                                                 <input type="date" class="form-control" name="end_date">
                                                             </div>
                                                         </div>
+                                                        <div class="col-md-12 col-sm-12">
+                                                            <div class="form-group">
+                                                                <label for="status">Filter Status </label>
+                                                                <select class="form-control" name="status">
+                                                                    <option value="">Semua Status</option>
+                                                                    <option value="4">Approved</option>
+                                                                    <option value="0">Pending</option>
+                                                                    <option value="5">Rejected</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
                                                         <div class="col-md-12 col-sm12">
                                                             <div class="form-group mb-3">
                                                                 <label for="start_date">Format Export</label>
@@ -81,9 +92,11 @@
                                 <thead>
                                     <tr>
                                         <th>Nama Barang</th>
+                                        <th>Supplier</th>
                                         <th>Jumlah Pembelian</th>
                                         <th>Harga Satuan</th>
                                         <th>Total Harga</th>
+                                        <th>Tgl Transaksi</th>
                                         <th>Status</th>
                                         <th>Status Pembayaran</th>
                                         <th>Actions</th>
@@ -93,9 +106,11 @@
                                     @foreach ($purchases as $p)
                                         <tr>
                                             <td>{{ $p->stock->stock_name }}</td>
+                                            <td>{{ $p->supplier ? $p->supplier->supplier_name : '-' }}</td>
                                             <td>{{ $p->purchase_quantity }} {{ $p->stock->stock_satuan }}</td>
                                             <td>Rp {{ number_format($p->purchase_price, 0, ',', '.') }}</td>
                                             <td>Rp {{ number_format($p->purchase_total, 0, ',', '.') }}</td>
+                                            <td>{{ $p->created_at->format('d-m-Y H:i:s') }}</td>
                                             <td>
                                                 @switch($p->status_id)
                                                     @case(1)
@@ -106,7 +121,7 @@
 
                                                     @case(2)
                                                         <label for="status" class="badge badge-success">
-                                                            Done
+                                                            Approved
                                                         </label>
                                                     @break
 
@@ -118,7 +133,7 @@
 
                                                     @case(4)
                                                         <label for="status" class="badge badge-success">
-                                                            Done
+                                                            Approved
                                                         </label>
                                                     @break
 
@@ -175,6 +190,8 @@
                                                             <div class="col-md-6 col-sm-12">
                                                                 <p><b>Nama Barang:</b>
                                                                     {{ $p->stock->stock_name }}</p>
+                                                                <p><b>Supplier:</b>
+                                                                    {{ $p->supplier ? $p->supplier->supplier_name : '-' }}</p>
                                                                 <p><b>Jumlah Pembelian:</b> {{ $p->purchase_quantity }}
                                                                     {{ $p->stock->stock_satuan }}</p>
                                                                 <p><b>Harga Satuan:</b> Rp

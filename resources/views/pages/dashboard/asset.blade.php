@@ -7,6 +7,20 @@
 @section('content.dashboard')
     <div class="content-wrapper">
         <div class="row">
+
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12">
+                                <h4 class="card-title">Total Nilai Aset</h4>
+                                <h2 class="text-primary">Rp {{ number_format($totalAssetValue, 0, ',', '.') }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="col-lg-12 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
@@ -17,10 +31,11 @@
                                     data-bs-target="#addModal">
                                     <i class="mdi mdi-plus"></i> Tambah Aset
                                 </button>
-                                
+
                                 {{-- Export Buttons --}}
                                 <div class="btn-group">
-                                    <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown"
+                                        aria-expanded="false">
                                         <i class="mdi mdi-export"></i> Export
                                     </button>
                                     <ul class="dropdown-menu">
@@ -64,13 +79,20 @@
                                                 <div class="form-group">
                                                     <label for="purchase_date">Tanggal Pembelian <span
                                                             style="color:red">*</span></label>
-                                                    <input type="date" class="form-control" name="purchase_date" required>
+                                                    <input type="date" class="form-control" name="purchase_date"
+                                                        required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="purchase_price">Harga Beli <span
                                                             style="color:red">*</span></label>
                                                     <input type="number" class="form-control" name="purchase_price"
                                                         required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="lifetime_years">Life Time (Tahun) <span
+                                                            style="color:red">*</span></label>
+                                                    <input type="number" class="form-control" name="lifetime_years"
+                                                        min="1" value="4" required>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="asset_photo">Foto Aset</label>
@@ -99,6 +121,7 @@
                                         <th>Life Time</th>
                                         <th>Deviasi / Bulan</th>
                                         <th>Nilai Aset Saat Ini</th>
+                                        <th>Tgl Dibuat</th>
                                         <th>Foto</th>
                                         <th>Actions</th>
                                     </tr>
@@ -117,6 +140,7 @@
                                                     Rp {{ number_format($asset->current_value, 0, ',', '.') }}
                                                 </span>
                                             </td>
+                                            <td>{{ $asset->created_at->format('d-m-Y H:i:s') }}</td>
                                             <td>
                                                 @if ($asset->asset_photo)
                                                     <button class="btn btn-info btn-sm" data-bs-toggle="modal"
@@ -127,33 +151,38 @@
                                                     -
                                                 @endif
                                             </td>
-                                            <td>
-                                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
-                                                    data-bs-target="#updateModal-{{ $asset->asset_id }}">
-                                                    <i class="mdi mdi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-danger btn-sm" id="delete_asset"
-                                                    data-id="{{ $asset->asset_id }}">
-                                                    <i class="mdi mdi-delete"></i>
-                                                </button>
-                                            </td>
+                                            @if (in_array(session()->get('user')->role_id, [2, 5, 6]))
+                                                <td>
+                                                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                                                        data-bs-target="#updateModal-{{ $asset->asset_id }}">
+                                                        <i class="mdi mdi-pencil"></i>
+                                                    </button>
+                                                    <button class="btn btn-danger btn-sm" id="delete_asset"
+                                                        data-id="{{ $asset->asset_id }}">
+                                                        <i class="mdi mdi-delete"></i>
+                                                    </button>
+                                                </td>
+                                            @else
+                                                <td>-</td>
+                                            @endif
                                         </tr>
 
                                         {{-- Photo Modal --}}
                                         @if ($asset->asset_photo)
-                                            <div class="modal fade" id="photoModal-{{ $asset->asset_id }}" tabindex="-1"
-                                                aria-hidden="true">
+                                            <div class="modal fade" id="photoModal-{{ $asset->asset_id }}"
+                                                tabindex="-1" aria-hidden="true">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title">Foto Aset: {{ $asset->asset_name }}
                                                             </h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                                aria-label="Close"></button>
+                                                            <button type="button" class="btn-close"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body text-center">
                                                             <img src="{{ url('storage/assets/' . $asset->asset_photo) }}"
-                                                                alt="Foto Aset" class="img-fluid" style="max-height: 400px;">
+                                                                alt="Foto Aset" class="img-fluid"
+                                                                style="max-height: 400px;">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -178,13 +207,15 @@
                                                             @method('PUT')
                                                             <div class="form-group">
                                                                 <label>Kode Aset <span style="color:red">*</span></label>
-                                                                <input type="text" class="form-control" name="asset_code"
-                                                                    value="{{ $asset->asset_code }}" required>
+                                                                <input type="text" class="form-control"
+                                                                    name="asset_code" value="{{ $asset->asset_code }}"
+                                                                    required>
                                                             </div>
                                                             <div class="form-group">
                                                                 <label>Nama Aset <span style="color:red">*</span></label>
-                                                                <input type="text" class="form-control" name="asset_name"
-                                                                    value="{{ $asset->asset_name }}" required>
+                                                                <input type="text" class="form-control"
+                                                                    name="asset_name" value="{{ $asset->asset_name }}"
+                                                                    required>
                                                             </div>
                                                             <div class="form-group">
                                                                 <label>Tanggal Pembelian <span
@@ -198,6 +229,13 @@
                                                                 <input type="number" class="form-control"
                                                                     name="purchase_price"
                                                                     value="{{ $asset->purchase_price }}" required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label>Life Time (Tahun) <span
+                                                                        style="color:red">*</span></label>
+                                                                <input type="number" class="form-control"
+                                                                    name="lifetime_years" min="1"
+                                                                    value="{{ $asset->lifetime_years ?? 4 }}" required>
                                                             </div>
                                                             <div class="form-group">
                                                                 <label>Ganti Foto (Opsional)</label>

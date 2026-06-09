@@ -32,10 +32,10 @@ class FinanceExport implements FromCollection, WithHeadings
                         "ID" => $f->finance_id,
                         "Kode Transaksi" => $f->finance_code,
                         "Type Transaksi" => substr($f->finance_code, 0, 1) == "O"
-                        ? "Pembelian" : (substr($f->finance_code, 0, 1) == "S" ? "Penjualan" : "Pembelian"),
+                            ? "Pembelian" : (substr($f->finance_code, 0, 1) == "S" ? "Penjualan" : "Pembelian"),
                         "Nama Transaksi" => $f->finance_name,
-                        "Kredit" => "Rp. " . number_format($f->finance_credit, 0, ",", ".") . ",-",
-                        "Debet" => "Rp. " . number_format($f->finance_debet, 0, ",", ".") . ",-",
+                        "Kredit" => (int) $f->finance_credit,
+                        "Debet" => (int) $f->finance_debet,
                         "Deskripsi" => $f->finance_description,
                         "Tanggal Transaksi" => $f->created_at->format("Y-m-d"),
                     ];
@@ -48,15 +48,29 @@ class FinanceExport implements FromCollection, WithHeadings
                         "ID" => $f->finance_id,
                         "Kode Transaksi" => $f->finance_code,
                         "Type Transaksi" => substr($f->finance_code, 0, 1) == "O"
-                        ? "Pembelian" : (substr($f->finance_code, 0, 1) == "S" ? "Penjualan" : "Pembelian"),
+                            ? "Pembelian" : (substr($f->finance_code, 0, 1) == "S" ? "Penjualan" : "Pembelian"),
                         "Nama Transaksi" => $f->finance_name,
-                        "Kredit" => "Rp. " . number_format($f->finance_credit, 0, ",", ".") . ",-",
-                        "Debet" => "Rp. " . number_format($f->finance_debet, 0, ",", ".") . ",-",
+                        "Kredit" => (int) $f->finance_credit,
+                        "Debet" => (int) $f->finance_debet,
                         "Deskripsi" => $f->finance_description,
                         "Tanggal Transaksi" => $f->created_at->format("Y-m-d"),
                     ];
                 });
         }
+
+        $totalCredit = $finances->sum("Kredit");
+        $totalDebet = $finances->sum("Debet");
+
+        $finances->push([
+            "ID" => "",
+            "Kode Transaksi" => "",
+            "Type Transaksi" => "",
+            "Nama Transaksi" => "TOTAL",
+            "Kredit" => $totalCredit,
+            "Debet" => $totalDebet,
+            "Deskripsi" => "",
+            "Tanggal Transaksi" => "",
+        ]);
 
         return $finances;
     }

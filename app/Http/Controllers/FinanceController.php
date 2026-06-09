@@ -16,17 +16,23 @@ class FinanceController extends Controller
             return redirect()->route('dashboard');
         }
 
-        $finances = Finance::with([
-            "purchase:purchases.*",
-            "sale:sales.*",
-        ])
-            ->orderBy("finance_id", "desc")
-            ->get();
+        $query = Finance::with([
+            "purchase.supplier",
+            "sale.customer",
+            "supplier"
+        ])->orderBy("finance_id", "desc");
+
+        $totalDebet = $query->sum("finance_debet");
+        $totalCredit = $query->sum("finance_credit");
+
+        $finances = $query->paginate(100);
 
         return view(
             "pages.dashboard.finance",
             compact(
-                "finances"
+                "finances",
+                "totalDebet",
+                "totalCredit"
             )
         );
     }

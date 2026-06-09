@@ -5,6 +5,18 @@
 @endsection
 
 @section('content.dashboard')
+    <style>
+        .select2-search--dropdown .select2-search__field {
+            background-color: #e9ecef !important;
+            color: #333 !important;
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected],
+        .select2-container--bootstrap .select2-results__option--highlighted[aria-selected] {
+            background-color: #f8f9fa !important;
+            color: #333 !important;
+        }
+    </style>
     <div class="content-wrapper">
         <div class="row">
             <div class="col-lg-12 grid-margin stretch-card">
@@ -16,6 +28,53 @@
                                 <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal"
                                     data-bs-target="#addModal">Add Data</button>
                             @endif
+
+                            <button type="button" class="btn btn-success me-2" data-bs-toggle="modal"
+                                data-bs-target="#exportModal">Export Data</button>
+
+                            {{-- Export modal --}}
+                            <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="addModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="addModalLabel">Export Data Pembelian</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <form class="forms-sample" method="POST"
+                                                    action="{{ route('purchase.export') }}" enctype="multipart/form-data">
+                                                    @csrf
+
+                                                    <div class="col-md-12 col-sm12">
+                                                        <div class="form-group mb-3">
+                                                            <label for="start_date">Format Export</label>
+                                                            <div class="row">
+                                                                <div class="col-md-6 col-sm-12">
+                                                                    <input type="radio" name="format" id="format"
+                                                                        value="1" checked> Excel
+                                                                </div>
+                                                                <div class="col-md-6 col-sm-12">
+                                                                    <input type="radio" name="format" id="format"
+                                                                        value="2"> Pdf
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="d-block mt-3">
+                                                        <button type="submit" class="btn btn-primary me-2">Submit</button>
+                                                        <button class="btn btn-light" type="button"
+                                                            data-bs-dismiss="modal">Cancel</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             {{-- Add modal --}}
                             <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel"
@@ -33,10 +92,21 @@
                                                     action="{{ route('purchase.store') }}">
                                                     @csrf
                                                     <div class="form-group">
+                                                        <label for="supplier_id">Supplier <span style="color: red">
+                                                                *</span></label>
+                                                        <select class="form-select" name="supplier_id" id="supplier_select">
+                                                            <option selected hidden>=== Pilih Supplier ===</option>
+                                                            @foreach ($suppliers as $supplier)
+                                                                <option value="{{ $supplier->supplier_id }}">
+                                                                    {{ $supplier->supplier_name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group">
                                                         <label for="stock_id">Nama Barang <span style="color: red">
                                                                 *</span></label>
                                                         <select id="stock_select" class="form-select" name="stock_id">
-                                                            <option selected hidden>=== Pilih Barang === </option>
+                                                            <option></option>
                                                             @foreach ($stocks as $stock)
                                                                 <option value={{ $stock->stock_id }}
                                                                     data-satuan={{ $stock->stock_satuan }}>
@@ -46,23 +116,21 @@
                                                         </select>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label for="purchase_description">Deskripsi Pembelian <span
-                                                                style="color: red">
-                                                                *</span></label>
+                                                        <label for="purchase_description">Deskripsi Pembelian </label>
                                                         <textarea name="purchase_description" class="form-control" cols="30" rows="10"></textarea>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label for="stock_id">Jumlah Barang <span
-                                                                style="color: red">
+                                                        <label for="stock_id">Jumlah Barang <span style="color: red">
                                                                 *</span></label>
-                                                        <input class="form-control" type="text"
-                                                            name="purchase_quantity" id="purchase_quantity">
+                                                        <input class="form-control" type="number" name="purchase_quantity"
+                                                            id="purchase_quantity">
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-md-6 col-sm-12">
                                                             <div class="form-group">
                                                                 <label for="stock_id">Harga Satuan / <span
-                                                                        id="satuan_barang"></span> <span style="color: red">
+                                                                        id="satuan_barang"></span> <span
+                                                                        style="color: red">
                                                                         *</span></label>
                                                                 <input class="form-control" type="text"
                                                                     name="purchase_price" id="purchase_price">
@@ -88,10 +156,11 @@
                                                         <div class="form-group">
                                                             <label for="stock_id">Total Harga <span style="color: red">
                                                                     *</span></label>
-                                                            <input class="form-control" type="text" name="purchase_total"
-                                                                id="purchase_total_show" disabled readonly>
-                                                            <input class="form-control" type="text" name="purchase_total"
-                                                                id="purchase_total" hidden>
+                                                            <input class="form-control" type="text"
+                                                                name="purchase_total" id="purchase_total_show" disabled
+                                                                readonly>
+                                                            <input class="form-control" type="text"
+                                                                name="purchase_total" id="purchase_total" hidden>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
@@ -109,7 +178,8 @@
                                                         </div>
                                                     </div>
                                                     <div class="d-block">
-                                                        <button type="submit" class="btn btn-primary me-2">Submit</button>
+                                                        <button type="submit"
+                                                            class="btn btn-primary me-2">Submit</button>
                                                         <button class="btn btn-light" type="button"
                                                             data-bs-dismiss="modal">Cancel</button>
                                                     </div>
@@ -126,9 +196,11 @@
                                 <thead>
                                     <tr>
                                         <th>Nama Barang</th>
+                                        <th>Supplier</th>
                                         <th>Jumlah Pembelian</th>
                                         <th>Harga Satuan</th>
                                         <th>Total Harga</th>
+                                        <th>Tgl Transaksi</th>
                                         <th>Status</th>
                                         <th>Status Pembayaran</th>
                                         <th>Actions</th>
@@ -138,9 +210,12 @@
                                     @foreach ($purchases as $p)
                                         <tr>
                                             <td>{{ $p->stock->stock_name }}</td>
+                                            <td>{{ $p->supplier ? $p->supplier->supplier_name : '-' }}</td>
                                             <td>{{ $p->purchase_quantity }} {{ $p->stock->stock_satuan }}</td>
                                             <td>Rp {{ number_format($p->purchase_price, 0, ',', '.') }}</td>
                                             <td>Rp {{ number_format($p->purchase_total, 0, ',', '.') }}</td>
+                                            <td>{{ $p->created_at->setTimezone('Asia/Jakarta')->format('d-m-Y H:i:s') }}
+                                            </td>
                                             <td>
                                                 <label
                                                     class="badge 
@@ -174,10 +249,12 @@
                                                         Info </button>
 
                                                     @if ($p->payment_status == 'Belum Lunas')
-                                                        <button class="dropdown-item" id="pay_purchase"
-                                                            data-id="{{ $p->purchase_id }}"><i
-                                                                class="dropdown-item-icon mdi mdi-cash-multiple me-2"></i>
-                                                            Bayar</button>
+                                                        @if (in_array(auth()->user()->role_id, [1, 2, 5, 6]))
+                                                            <button class="dropdown-item" id="pay_purchase"
+                                                                data-id="{{ $p->purchase_id }}"><i
+                                                                    class="dropdown-item-icon mdi mdi-cash-multiple me-2"></i>
+                                                                Bayar</button>
+                                                        @endif
                                                     @endif
 
                                                     @if ($p->status->status_id == 6)
@@ -194,7 +271,7 @@
                                                                 class="dropdown-item-icon mdi mdi-delete-outline me-2"></i>
                                                             Delete</button>
                                                     @else
-                                                        @if (session()->get('user')->role_id == 2)
+                                                        @if (in_array(session()->get('user')->role_id, [2, 5, 6]))
                                                             @if ($p->status->status_id == 3)
                                                                 <button class="dropdown-item"
                                                                     data-id="{{ $p->purchase_id }}"
@@ -260,6 +337,9 @@
                                                             <div class="col-md-6 col-sm-12">
                                                                 <p><b>Nama Barang:</b>
                                                                     {{ $p->stock->stock_name }}</p>
+                                                                <p><b>Supplier:</b>
+                                                                    {{ $p->supplier ? $p->supplier->supplier_name : '-' }}
+                                                                </p>
                                                                 <p><b>Jumlah Pembelian:</b> {{ $p->purchase_quantity }}
                                                                     {{ $p->stock->stock_satuan }}</p>
                                                                 <p><b>Harga Satuan:</b> Rp
@@ -337,6 +417,22 @@
                                                                 @csrf
                                                                 @method('PUT')
                                                                 <div class="form-group">
+                                                                    <label for="supplier_id">Supplier <span
+                                                                            style="color: red"> *</span></label>
+                                                                    <select class="form-select supplier-select-update"
+                                                                        name="supplier_id">
+                                                                        <option selected hidden
+                                                                            value="{{ $p->supplier_id }}">
+                                                                            {{ $p->supplier ? $p->supplier->supplier_name : '=== Pilih Supplier ===' }}
+                                                                        </option>
+                                                                        @foreach ($suppliers as $supplier)
+                                                                            <option value="{{ $supplier->supplier_id }}">
+                                                                                {{ $supplier->supplier_name }}
+                                                                            </option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
                                                                     <label for="stock_id">Nama Barang <span
                                                                             style="color: red"> *</span></label>
                                                                     <select id="stock_select" class="form-select"
@@ -394,7 +490,8 @@
                                                                                     {{ $p->payment ? $p->payment->payment_name : '=== Pilih Pembayaran ===' }}
                                                                                 </option>
                                                                                 @foreach ($payments as $payment)
-                                                                                    <option value="{{ $payment->payment_id }}">
+                                                                                    <option
+                                                                                        value="{{ $payment->payment_id }}">
                                                                                         {{ $payment->payment_name }}
                                                                                     </option>
                                                                                 @endforeach
@@ -449,6 +546,44 @@
     <script>
         $(document).ready(function() {
             $('#table-purchase').DataTable();
+
+            $('#addModal #stock_select').select2({
+                dropdownParent: $('#addModal'),
+                placeholder: '=== Pilih Barang ===',
+                width: '100%',
+                templateResult: function(data) {
+                    if (!data.id) {
+                        return data.text;
+                    }
+                    var satuan = $(data.element).data('satuan');
+
+                    var $result = $(
+                        '<div style="padding: 4px;">' +
+                        '<div style="font-weight: bold; font-size: 1.1em;">' + data.text +
+                        '</div>' +
+                        '<div style="font-size: 0.9em; color: #555; margin-top: 4px;">' +
+                        'Satuan: ' + (satuan ?
+                            satuan : '-') +
+                        '</div>' +
+                        '</div>'
+                    );
+                    return $result;
+                }
+            });
+
+            $('#addModal #supplier_select').select2({
+                dropdownParent: $('#addModal'),
+                placeholder: '=== Pilih Supplier ===',
+                width: '100%'
+            });
+
+            $('.supplier-select-update').each(function() {
+                $(this).select2({
+                    dropdownParent: $(this).closest('.modal'),
+                    placeholder: '=== Pilih Supplier ===',
+                    width: '100%'
+                });
+            });
         });
 
         $(document).ready(function() {
@@ -621,10 +756,18 @@
                             } else {
                                 Swal.fire(
                                     'Failed!',
-                                    response.message,
+                                    response.responseJSON.message,
                                     'error'
                                 )
                             }
+                        },
+                        error: function(response) {
+                            console.log(response);
+                            Swal.fire(
+                                'Failed!',
+                                response.message,
+                                'error'
+                            )
                         }
                     });
                 }
@@ -704,6 +847,14 @@
                                     'error'
                                 )
                             }
+                        },
+                        error: function(response) {
+                            console.log(response);
+                            Swal.fire(
+                                'Gagal!',
+                                response.message,
+                                'error'
+                            )
                         }
                     });
                 }

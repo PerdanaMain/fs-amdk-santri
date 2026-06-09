@@ -19,9 +19,9 @@
                     </div>
                     {{-- make forgot password button --}}
                     <div class="mb-3">
-                        <a role="button" id="forgot-btn" class="text-decoration-none">Forgot Password?</a>
+                        <a role="button" id="forgot-btn" class="text-decoration-none text-secondary">Forgot Password?</a>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                    <button type="submit" class="btn btn-success w-100">Login</button>
                 </form>
             </div>
 

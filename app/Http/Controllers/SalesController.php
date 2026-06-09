@@ -35,6 +35,7 @@ class SalesController extends Controller
 
             $sales = $sales
                 ->where("status_id", "!=", 2)
+                ->where("status_id", "!=", 5)
                 ->orderBy("sale_id", "desc")
                 ->get();
 
@@ -76,15 +77,14 @@ class SalesController extends Controller
             "customer:customer_id,customer_name",
             "status:status_id,status_description",
             "payment:payment_id,payment_description",
-        ]);
+        ])->whereNotIn("status_id", [1,3,6]);
+
 
         if (in_array($user->role_id, [1, 2, 4, 5, 6])) {
             $sales = $sales
-                ->where("status_id", 2)
                 ->get();
         } else {
             $sales = $sales
-                ->where("status_id", 2)
                 ->where("user_id", $user->user_id)
                 ->get();
         }
@@ -115,9 +115,9 @@ class SalesController extends Controller
                 "stock:stocks.*",
                 "payment:payments.*",
             )
-                ->where("status_id", 2);
-            if ($start == null && $end == null) {
+                ->whereNotIn("status_id", [1, 3, 6]);
 
+            if ($start == null && $end == null) {
                 $sales = $sales->orderBy("sale_id", "desc")
                     ->get();
             } else {
@@ -130,7 +130,7 @@ class SalesController extends Controller
             }
 
             if ($format == 1) {
-                return Excel::download(new SaleExport, 'sales.xlsx');
+                return Excel::download(new SaleExport($sales), 'sales.xlsx');
             } else {
                 $pdf = \PDF::loadView('pages.exports.sale', compact('sales'))
                     ->setPaper('a4', 'landscape');
@@ -138,6 +138,53 @@ class SalesController extends Controller
             }
         } catch (\Throwable $th) {
             return back()->with("sale.error", $th->getMessage());
+        }
+    }
+
+    public function exportList()
+    {
+        try {
+            request()->validate([
+                "format" => "required",
+            ]);
+
+            $format = (int) request("format");
+            $user = session()->get('user');
+
+            $sales = Sale::with(
+                "customer",
+                "payment",
+                "stock",
+                "status",
+                "user"
+            );
+
+            if (in_array($user->role_id, [1, 2, 4, 5, 6])) {
+                $sales = $sales
+                    ->where("status_id", "!=", 2)
+                    ->orderBy("sale_id", "desc")
+                    ->get();
+            } else {
+                $sales = $sales
+                    ->where("status_id", "!=", 2)
+                    ->where("user_id", $user->user_id)
+                    ->orderBy("sale_id", "desc")
+                    ->get();
+            }
+
+            if ($sales->count() == 0) {
+                return back()->with('sale.error', 'Data penjualan tidak ditemukan.');
+            }
+
+            if ($format == 1) {
+                return Excel::download(new SaleExport($sales), 'sales_list.xlsx');
+            } else {
+                $pdf = \PDF::loadView('pages.exports.sale', compact('sales'))
+                    ->setPaper('a4', 'landscape');
+                return $pdf->download('Data-Penjualan-List.pdf');
+            }
+        } catch (\Throwable $th) {
+            return back()->with('sale.error', $th->getMessage());
         }
     }
 
@@ -157,7 +204,7 @@ class SalesController extends Controller
             ]);
             $user = session()->get('user');
             $dateTime = date_format(date_create(request("sale_date")), "Y-m-d H:i:s");
-            
+
             // Payment Logic: Cash (1) = Lunas, Others = Belum Lunas
             $paymentStatus = ((int)request("payment_id") == 1) ? 'Lunas' : 'Belum Lunas';
 
@@ -302,9 +349,26 @@ class SalesController extends Controller
     public function pay($id)
     {
         try {
-            Sale::where("sale_id", $id)->update([
+            $sale = Sale::where("sale_id", $id);
+            $saleData = $sale->first();
+
+            $updateData = [
                 "payment_status" => "Lunas",
-            ]);
+            ];
+
+            if ($saleData->status_id == 2 && $saleData->finance_id == null) {
+                $finance = Finance::create([
+                    "finance_code" => "S-" . rand(1, 99999999),
+                    "finance_name" => "Penjualan " . $saleData->sale_description,
+                    "finance_debet" => $saleData->sale_total,
+                    "finance_credit" => 0,
+                    "finance_description" => "Penjualan " . $saleData->sale_description,
+                ]);
+
+                $updateData["finance_id"] = $finance->finance_id;
+            }
+
+            $sale->update($updateData);
 
             return response()->json([
                 "status" => true,
@@ -324,8 +388,9 @@ class SalesController extends Controller
             $user = session()->get("user");
             if (in_array($user->role_id, [1, 2])) {
                 $sale = Sale::where("sale_id", $id);
+                $saleData = $sale->first();
 
-                $stock = Stock::where("stock_id", $sale->first()->stock_id);
+                $stock = Stock::where("stock_id", $saleData->stock_id);
 
                 if ($stock->first()->stock_quantity == 0) {
                     return response()->json([
@@ -333,26 +398,34 @@ class SalesController extends Controller
                         "message" => "Stock is empty",
                     ])->setStatusCode(400);
                 } else {
-                    $stock->decrement("stock_quantity", $sale->first()->sale_quantity);
+                    $stock->decrement("stock_quantity", $saleData->sale_quantity);
                 }
 
-                $finance = Finance::create([
-                    "finance_code" => "S-" . rand(1, 99999999),
-                    "finance_name" => "Penjualan " . $sale->first()->sale_description,
-                    "finance_debet" => $sale->first()->sale_total,
-                    "finance_credit" => 0,
-                    "finance_description" => "Penjualan " . $sale->first()->sale_description,
-                ]);
+                $finance = null;
+                if ($saleData->payment_status != 'Belum Lunas') {
+                    $finance = Finance::create([
+                        "finance_code" => "S-" . rand(1, 99999999),
+                        "finance_name" => "Penjualan " . $saleData->sale_description,
+                        "finance_debet" => $saleData->sale_total,
+                        "finance_credit" => 0,
+                        "finance_description" => "Penjualan " . $saleData->sale_description,
+                    ]);
+                }
 
-                $shipment = Shipment::create([
-                    "sale_id" => $sale->first()->sale_id,
+                Shipment::create([
+                    "sale_id" => $saleData->sale_id,
                     "shipment_status" => "PENDING",
                 ]);
 
-                $sale->update([
+                $updateData = [
                     "status_id" => 2,
-                    "finance_id" => $finance->finance_id,
-                ]);
+                ];
+
+                if ($finance) {
+                    $updateData["finance_id"] = $finance->finance_id;
+                }
+
+                $sale->update($updateData);
 
                 return response()->json([
                     "status" => true,
@@ -366,7 +439,6 @@ class SalesController extends Controller
                     "user" => $user,
                 ])->setStatusCode(403);
             }
-
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,

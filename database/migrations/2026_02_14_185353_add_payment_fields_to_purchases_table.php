@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('purchases', function (Blueprint $table) {
             $table->unsignedBigInteger('payment_id')->nullable()->after('stock_id');
-            $table->string('payment_status')->default('Belum Lunas')->after('purchase_total');
+            $table->string('payment_status')->default('Lunas')->after('purchase_total');
             
             $table->foreign('payment_id')->references('payment_id')->on('payments')->onDelete('cascade');
         });

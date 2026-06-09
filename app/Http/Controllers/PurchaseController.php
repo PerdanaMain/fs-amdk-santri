@@ -7,6 +7,8 @@ use App\Models\Finance;
 use App\Models\Payment;
 use App\Models\Purchase;
 use App\Models\Stock;
+use App\Models\Supplier;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -24,17 +26,20 @@ class PurchaseController extends Controller
             "status:status_id,status_description",
             "stock:stocks.*",
         ])
-            ->where("status_id", "!=", 4)
+            ->whereNotIn("status_id", [4, 5])
+            ->orWhere("payment_status", "Belum Lunas")
             ->get();
         $stocks = Stock::all();
         $payments = Payment::all();
+        $suppliers = Supplier::all();
 
         return view(
             'pages.dashboard.purchase',
             compact(
                 'purchases',
                 "stocks",
-                "payments"
+                "payments",
+                "suppliers"
             )
         );
     }
@@ -51,14 +56,49 @@ class PurchaseController extends Controller
             "status:status_id,status_description",
             "stock:stocks.*",
         ])
-            ->where("status_id", 4)
-            ->where("payment_status", "Lunas")
+            ->whereNotIn("status_id", [1, 2, 3, 6])
             ->get();
+
+
 
         return view(
             "pages.dashboard.histories.purchase",
             compact("purchases")
         );
+    }
+
+    public function exportList()
+    {
+        try {
+            request()->validate([
+                "format" => "required",
+            ]);
+
+            $format = (int) request("format");
+
+            $purchase = Purchase::with([
+                "user:user_id,user_name",
+                "status:status_id,status_description",
+                "stock:stocks.*",
+            ])
+                ->whereNotIn("status_id", [4, 5])
+                ->orWhere("payment_status", "Belum Lunas")
+                ->get();
+
+            if ($purchase->count() == 0) {
+                return back()->with('purchase.error', 'Data pembelian tidak ditemukan.');
+            }
+
+            if ($format == 1) {
+                return Excel::download(new PurchaseExport($purchase), 'purchases_list.xlsx');
+            } else {
+                $pdf = Pdf::loadView('pages.exports.purchase', compact('purchase'))
+                    ->setPaper('a4', 'landscape');
+                return $pdf->download('Data-Pembelian-List.pdf');
+            }
+        } catch (\Throwable $th) {
+            return back()->with('purchase.error', $th->getMessage());
+        }
     }
 
     public function export()
@@ -71,13 +111,25 @@ class PurchaseController extends Controller
             $format = (int) request("format");
             $start = request("start_date");
             $end = request("end_date");
+            $status = request("status");
 
             $purchase = Purchase::with(
                 "user:users.*",
                 "status:statuses.*",
                 "stock:stocks.*"
-            )
-                ->where("status_id", 4);
+            );
+
+            // Apply status filter if provided
+            if ($status !== null && $status !== "") {
+                $status = (int) $status;
+                if ($status == 0) {
+                    $purchase = $purchase->whereNotIn("status_id", [1, 2, 3, 6]);
+                } else {
+                    $purchase = $purchase->where("status_id", $status);
+                }
+            } else {
+                $purchase = $purchase->whereNotIn("status_id", [1, 2, 3, 6]);
+            }
 
             if ($start == null && $end == null) {
                 $purchase = $purchase->orderBy("purchase_id", "desc")
@@ -92,9 +144,9 @@ class PurchaseController extends Controller
             }
 
             if ($format == 1) {
-                return Excel::download(new PurchaseExport, 'purchases.xlsx');
+                return Excel::download(new PurchaseExport($purchase), 'purchases.xlsx');
             } else {
-                $pdf = \PDF::loadView('pages.exports.purchase', compact('purchase'))
+                $pdf = Pdf::loadView('pages.exports.purchase', compact('purchase'))
                     ->setPaper('a4', 'landscape');
                 return $pdf->download('Data-Pembelian.pdf');
             }
@@ -108,10 +160,10 @@ class PurchaseController extends Controller
         // validate the request
         request()->validate([
             'stock_id' => 'required',
+            'supplier_id' => 'required',
             'purchase_quantity' => 'required|numeric',
             "purchase_price" => "required|numeric",
             "purchase_total" => "required|numeric",
-            "purchase_description" => "required",
             "purchase_status" => "required",
             "payment_id" => "required",
         ]);
@@ -121,12 +173,13 @@ class PurchaseController extends Controller
 
         Purchase::create([
             "stock_id" => (int) request("stock_id"),
+            "supplier_id" => (int) request("supplier_id"),
             "user_id" => (int) $user->user_id,
             "status_id" => (int) request("purchase_status"),
             "purchase_total" => (int) request("purchase_total"),
             "purchase_price" => (int) request("purchase_price"),
             "purchase_quantity" => (int) request("purchase_quantity"),
-            "purchase_description" => request("purchase_description"),
+            "purchase_description" => request("purchase_description") ?? "",
             "payment_id" => (int) request("payment_id"),
             "payment_status" => $paymentStatus,
         ]);
@@ -139,6 +192,7 @@ class PurchaseController extends Controller
         // validate the request
         $request->validate([
             'stock_id' => 'required',
+            'supplier_id' => 'required',
             'purchase_quantity' => 'required|numeric',
             "purchase_price" => "required|numeric",
             "purchase_description" => "required",
@@ -152,6 +206,7 @@ class PurchaseController extends Controller
         $purchase = Purchase::where("purchase_id", $id);
         $purchase->update([
             "stock_id" => (int) request("stock_id"),
+            "supplier_id" => (int) request("supplier_id"),
             "status_id" => (int) request("purchase_status"),
             "purchase_total" => $purchase_total,
             "purchase_price" => (int) request("purchase_price"),
@@ -168,15 +223,30 @@ class PurchaseController extends Controller
     {
         try {
             $purchase = Purchase::where("purchase_id", $id);
+            $purchaseData = $purchase->firstOrFail();
+
             $purchase->update([
                 "payment_status" => "Lunas",
             ]);
+
+            if ((int) $purchaseData->status_id === 4 && $purchaseData->finance_id == null) {
+                $finance = Finance::create([
+                    "finance_code" => "P-" . rand(1, 99999999),
+                    "finance_name" => "Pembelian " . $purchaseData->purchase_description,
+                    "finance_debet" => 0,
+                    "finance_credit" => $purchaseData->purchase_total,
+                    "finance_description" => "Pembelian " . $purchaseData->purchase_description,
+                ]);
+
+                $purchase->update([
+                    "finance_id" => $finance->finance_id,
+                ]);
+            }
 
             return response()->json([
                 "status" => true,
                 "message" => "Status pembayaran berhasil diubah.",
             ])->setStatusCode(200);
-
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
@@ -216,7 +286,6 @@ class PurchaseController extends Controller
                 "status" => true,
                 "message" => "Data pembelian berhasil diajukan.",
             ])->setStatusCode(200);
-
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
@@ -229,7 +298,7 @@ class PurchaseController extends Controller
     {
         try {
             $user = session()->get("user");
-            if ($user->role_id !== 2) {
+            if (!in_array($user->role_id, [2, 5, 6])) {
                 return response()->json([
                     "status" => false,
                     "message" => "Anda tidak memiliki akses untuk menyetujui data pembelian.",
@@ -237,28 +306,33 @@ class PurchaseController extends Controller
             }
 
             $purchase = Purchase::where("purchase_id", $id);
+            $purchaseData = $purchase->firstOrFail();
 
-            Stock::where("stock_id", $purchase->first()->stock_id)
-                ->increment("stock_quantity", $purchase->first()->purchase_quantity);
-
-            $finance = Finance::create([
-                "finance_code" => "P-" . rand(1, 99999999),
-                "finance_name" => "Pembelian " . $purchase->first()->purchase_description,
-                "finance_debet" => 0,
-                "finance_credit" => $purchase->first()->purchase_total,
-                "finance_description" => "Pembelian " . $purchase->first()->purchase_description,
-            ]);
+            Stock::where("stock_id", $purchaseData->stock_id)
+                ->increment("stock_quantity", $purchaseData->purchase_quantity);
 
             $purchase->update([
                 "status_id" => 4,
-                "finance_id" => $finance->finance_id,
             ]);
+
+            if ($purchaseData->payment_status === "Lunas" && $purchaseData->finance_id == null) {
+                $finance = Finance::create([
+                    "finance_code" => "P-" . rand(1, 99999999),
+                    "finance_name" => "Pembelian " . $purchaseData->purchase_description,
+                    "finance_debet" => 0,
+                    "finance_credit" => $purchaseData->purchase_total,
+                    "finance_description" => "Pembelian " . $purchaseData->purchase_description,
+                ]);
+
+                $purchase->update([
+                    "finance_id" => $finance->finance_id,
+                ]);
+            }
 
             return response()->json([
                 "status" => true,
                 "message" => "Data pembelian berhasil disetujui.",
             ])->setStatusCode(200);
-
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,
@@ -271,7 +345,7 @@ class PurchaseController extends Controller
     {
         try {
             $user = session()->get("user");
-            if ($user->role_id !== 3) {
+            if ($user->role_id !== 2) {
                 return response()->json([
                     "status" => false,
                     "message" => "Anda tidak memiliki akses untuk menolak data pembelian.",
@@ -281,6 +355,7 @@ class PurchaseController extends Controller
             $purchase = Purchase::where("purchase_id", $id);
             $purchase->update([
                 "status_id" => 5,
+                "payment_status" => "Lunas",
                 "purchase_reject_message" => request("purchase_reject_message"),
             ]);
 
@@ -288,7 +363,6 @@ class PurchaseController extends Controller
                 "status" => true,
                 "message" => "Data pembelian berhasil ditolak.",
             ])->setStatusCode(200);
-
         } catch (\Throwable $th) {
             return response()->json([
                 "status" => false,

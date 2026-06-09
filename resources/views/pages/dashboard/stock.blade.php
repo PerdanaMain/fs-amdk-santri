@@ -12,9 +12,32 @@
                     <div class="card-body">
                         <h4 class="card-title">Air Mineral Stocks</h4>
                         <div class="d-block my-4">
-                            @if (in_array(session()->get('user')->role_id, [1, 2]))
+                            @if (in_array(session()->get('user')->role_id, [1, 2, 5, 6]))
                                 <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal"
                                     data-bs-target="#addModal">Add Stock</button>
+
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown"
+                                        aria-expanded="false">
+                                        <i class="mdi mdi-export"></i> Export
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <form action="{{ route('stocks.export') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="format" value="1">
+                                                <button type="submit" class="dropdown-item">Excel</button>
+                                            </form>
+                                        </li>
+                                        <li>
+                                            <form action="{{ route('stocks.export') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="format" value="2">
+                                                <button type="submit" class="dropdown-item">PDF</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
                             @endif
 
                             {{-- Add modal --}}
@@ -51,6 +74,7 @@
                                                         <select id="stock_select" class="form-select" name="stock_satuan">
                                                             <option value="Dus" selected>Dus</option>
                                                             <option value="Galon">Galon</option>
+                                                            <option value="Buah">Buah</option>
                                                         </select>
 
                                                     </div>
@@ -95,8 +119,14 @@
                                     @foreach ($stocks as $stock)
                                         <tr>
                                             <td class="py-1">
-                                                <img src="{{ url('storage/stocks/' . $stock->stock_photo) }}" alt="image"
-                                                    style="width: 90px; height:90px;" />
+
+                                                @if ($stock->stock_photo && $stock->stock_photo != '')
+                                                    <img src="{{ url('storage/stocks/' . $stock->stock_photo) }}"
+                                                        alt="image" style="width: 90px; height:90px;" />
+                                                @else
+                                                    <img src="{{ url('assets/images/carbon-filter.png') }}"
+                                                        alt="default image" style="width: 90px; height:90px;" />
+                                                @endif
                                             </td>
                                             <td>
                                                 {{ $stock->stock_name }}
@@ -120,7 +150,7 @@
                                                         data-bs-target="#infoModal-{{ $stock->stock_id }}"><i
                                                             class="dropdown-item-icon mdi mdi-information-outline me-2"></i>
                                                         Info </button>
-                                                    @if (in_array(session()->get('user')->role_id, [1, 2]))
+                                                    @if (in_array(session()->get('user')->role_id, [1, 2, 5, 6]))
                                                         <button class="dropdown-item" data-bs-toggle="modal"
                                                             data-bs-target="#updateModal-{{ $stock->stock_id }}"><i
                                                                 class="dropdown-item-icon mdi mdi-pencil-outline me-2"></i>
@@ -152,7 +182,8 @@
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <h4>{{ $stock->stock_name }}</h4>
-                                                                <p>{{ $stock->stock_description }}</p>
+                                                                <p class="mb-1"><strong>Description:</strong>
+                                                                    {{ $stock->stock_description }}</p>
                                                                 <p>Stock: {{ $stock->stock_quantity }}
                                                                     {{ $stock->stock_satuan }}</p>
                                                                 <p>
@@ -207,6 +238,7 @@
                                                                         value="{{ $stock->stock_satuan }}">
                                                                         <option value="Dus" selected>Dus</option>
                                                                         <option value="Galon">Galon</option>
+                                                                        <option value="Buah">Buah</option>
                                                                     </select>
 
                                                                 </div>
@@ -263,6 +295,15 @@
                         data: {
                             _token: $("input[name=_token]").val()
                         },
+                        onBeforeSend: function() {
+                            Swal.fire({
+                                title: 'Loading...',
+                                allowOutsideClick: false,
+                                onBeforeOpen: () => {
+                                    Swal.showLoading()
+                                }
+                            })
+                        },
                         success: function(response) {
                             if (response.status == true) {
                                 Swal.fire(
@@ -278,6 +319,13 @@
                                     'error'
                                 )
                             }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: xhr.responseJSON.message,
+                            })
                         }
                     });
                 }

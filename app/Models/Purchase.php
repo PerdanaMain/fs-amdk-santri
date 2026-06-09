@@ -14,6 +14,7 @@ class Purchase extends Model
     protected $primaryKey = 'purchase_id';
     protected $fillable = [
         'stock_id',
+        'supplier_id',
         'status_id',
         'user_id',
         "finance_id",
@@ -32,6 +33,10 @@ class Purchase extends Model
     public function stock(): BelongsTo
     {
         return $this->belongsTo(Stock::class, 'stock_id', 'stock_id');
+    }
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class, 'supplier_id', 'supplier_id');
     }
     public function status(): BelongsTo
     {

@@ -57,12 +57,13 @@
             <tr>
                 <th>ID</th>
                 <th>Nama Barang</th>
+                <th>Supplier</th>
                 <th>Jumlah Barang</th>
                 <th>Harga Barang</th>
                 <th>Total Harga</th>
-                <th>Diajukan Kepada</th>
+                <th>Diajukan Oleh</th>
                 <th>Tanggal Pengajuan</th>
-
+                <th>Status Pembayaran</th>
             </tr>
         </thead>
         <tbody>
@@ -70,13 +71,22 @@
                 <tr>
                     <td>{{ $p->purchase_id }}</td>
                     <td>{{ $p->stock->stock_name }}</td>
+                    <td>{{ $p->supplier ? $p->supplier->supplier_name : '-' }}</td>
                     <td>{{ $p->purchase_quantity }}</td>
                     <td>{{ number_format($p->purchase_price, 0, ',', '.') }}</td>
                     <td>{{ number_format($p->purchase_total, 0, ',', '.') }}</td>
                     <td>{{ $p->user->user_name }}</td>
                     <td>{{ $p->created_at->format('Y-m-d') }}</td>
+                    <td>{{ $p->payment_status }}</td>
                 </tr>
             @endforeach
+            <tr>
+                <td colspan="3" style="text-align: right; font-weight: bold;">Total</td>
+                <td style="font-weight: bold;">{{ $purchase->sum('purchase_quantity') }}</td>
+                <td></td>
+                <td style="font-weight: bold;">{{ number_format($purchase->sum('purchase_total'), 0, ',', '.') }}</td>
+                <td colspan="3"></td>
+            </tr>
         </tbody>
     </table>
 </body>
