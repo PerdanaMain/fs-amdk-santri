@@ -89,12 +89,19 @@
                         @endswitch
                     </td>
                     <td>{{ $finance->finance_name }}</td>
-                    <td>{{ $finance->finance_debet }}</td>
-                    <td>{{ $finance->finance_credit }}</td>
-                    <td>{{ $finance->finance_descriptioin }}</td>
+                    <td>{{ number_format($finance->finance_debet, 0, ',', '.') }}</td>
+                    <td>{{ number_format($finance->finance_credit, 0, ',', '.') }}</td>
+                    <td>{{ $finance->finance_description }}</td>
                     <td>{{ $finance->created_at->format('Y-m-d') }}</td>
                 </tr>
             @endforeach
+            <tr>
+                <td colspan="3" style="text-align: right; font-weight: bold;">Total</td>
+                <td style="font-weight: bold;">{{ $purchase->sum('purchase_quantity') }}</td>
+                <td></td>
+                <td style="font-weight: bold;">{{ number_format($purchase->sum('purchase_total'), 0, ',', '.') }}</td>
+                <td colspan="3"></td>
+            </tr>
         </tbody>
     </table>
 </body>
